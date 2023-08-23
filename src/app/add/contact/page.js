@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import AddForm from './addForm';
 
@@ -9,9 +9,12 @@ const displayDate = (date) =>
 
 export default function AddContact() {
   const [contactModalData, setContactModalData] = useState(null);
-  const [contactList, setContactList] = useState(
-    JSON.parse(localStorage.getItem('listData')) || [],
-  );
+  const [contactList, setContactList] = useState([]);
+
+  useEffect(() => {
+    setContactList(JSON.parse(localStorage.getItem('listData')) || []);
+  }, []);
+
   const openContactDialog = (data, i) => {
     setContactModalData({ ...data, i });
     // document.getElementById('contactModal').showModal();
