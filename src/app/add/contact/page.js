@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 
 import AddForm from './addForm';
+import ContactCommonForm from './contactCommonForm';
 
 const displayDate = (date) =>
   Intl.DateTimeFormat('en-IN').format(new Date(date || null));
@@ -10,6 +11,7 @@ const displayDate = (date) =>
 export default function AddContact() {
   const [contactModalData, setContactModalData] = useState(null);
   const [contactList, setContactList] = useState([]);
+  const [isStep2Visible, setIsStep2Visible] = useState(false);
 
   useEffect(() => {
     setContactList(JSON.parse(localStorage.getItem('listData')) || []);
@@ -23,14 +25,15 @@ export default function AddContact() {
     setContactModalData(null);
   };
   const deleteData = (i) => {
-    confirm('Are you sure you want to delete?')
-      ? setContactList((prev) => {
-          const list = prev.splice(i, 1);
-          localStorage.setItem('listData', JSON.stringify(list));
+    // if (confirm('Are you sure you want to delete?'))
+    setContactList((prev) => {
+      const list = prev.splice(0, 1);
 
-          return list;
-        })
-      : '';
+      console.log('🚀 ~ file: page.js:32 ~ ?setContactList ~ i:', i, list);
+      localStorage.setItem('listData', JSON.stringify(prev));
+
+      return prev;
+    });
   };
 
   const MobileCard = ({ data, i }) => (
@@ -185,44 +188,52 @@ export default function AddContact() {
 
       <div className="p-5 h-screen bg-gray-100">
         <h1 className="text-xl mb-2 text-black">Contact Book</h1>
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 roundedfont-bold my-10"
-          onClick={openContactDialog}
-        >
-          Add Contact
-        </button>
-        <div className="overflow-auto rounded-lg shadow hidden md:block">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b-2 border-gray-200 text-black">
-              <tr>
-                <th className="w-20 p-3 text-sm font-semibold tracking-wide text-left">
-                  Name
-                </th>
-                <th className="w-20  p-3 text-sm font-semibold tracking-wide text-left">
-                  Gender
-                </th>
-                <th className="w-24 p-3 text-sm font-semibold tracking-wide text-left">
-                  Contact No.
-                </th>
-                <th className="w-24 p-3 text-sm font-semibold tracking-wide text-left">
-                  Date of Birth
-                </th>
-                <th className="w-32 p-3 text-sm font-semibold tracking-wide text-left">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {contactList.length ? (
-                contactList.map((_, i) => (
-                  <DesktopCard data={contactList[i]} i={i} key={i} />
-                ))
-              ) : (
-                <td className="text-black text-center" colSpan={5}>
-                  Start adding contacts to show here!
-                </td>
-              )}
-              {/* <tr className="bg-gray-50">
+        {!isStep2Visible ? (
+          <>
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 roundedfont-bold my-10"
+              onClick={openContactDialog}
+            >
+              Add Contact
+            </button>
+            <div className="overflow-auto rounded-lg shadow hidden md:block">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b-2 border-gray-200 text-black">
+                  <tr>
+                    <th className="w-20 p-3 text-sm font-semibold tracking-wide text-left">
+                      Name
+                    </th>
+                    <th className="w-20  p-3 text-sm font-semibold tracking-wide text-left">
+                      Gender
+                    </th>
+                    <th className="w-24 p-3 text-sm font-semibold tracking-wide text-left">
+                      Contact No.
+                    </th>
+                    <th className="w-24 p-3 text-sm font-semibold tracking-wide text-left">
+                      Date of Birth
+                    </th>
+                    <th className="w-32 p-3 text-sm font-semibold tracking-wide text-left">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {contactList.length ? (
+                    contactList.map((contact, i) => (
+                      <DesktopCard
+                        data={contactList[i]}
+                        i={i}
+                        key={contact.name}
+                      />
+                    ))
+                  ) : (
+                    <tr>
+                      <td className="text-black text-center" colSpan={5}>
+                        Start adding contacts to show here!
+                      </td>
+                    </tr>
+                  )}
+                  {/* <tr className="bg-gray-50">
               <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
                 <a href="#" className="font-bold text-blue-500 hover:underline">
                   10002
@@ -243,21 +254,37 @@ export default function AddContact() {
                 $200.00
               </td>
             </tr> */}
-            </tbody>
-          </table>
-        </div>
+                </tbody>
+              </table>
+            </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:hidden">
-          {contactList.length ? (
-            contactList.map((_, i) => (
-              <MobileCard data={contactList[i]} i={i} key={i} />
-            ))
-          ) : (
-            <p className="text-black mt-10 text-center">
-              Start adding contacts to show here!
-            </p>
-          )}
-        </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:hidden">
+              {contactList.length ? (
+                contactList.map((contact, i) => (
+                  <MobileCard data={contactList[i]} i={i} key={contact.name} />
+                ))
+              ) : (
+                <p className="text-black mt-10 text-center">
+                  Start adding contacts to show here!
+                </p>
+              )}
+            </div>
+            {contactList.length && (
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <button
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 roundedfont-bold my-10"
+                  onClick={() => setIsStep2Visible(true)}
+                >
+                  Proceed to next step
+                </button>
+              </div>
+            )}
+          </>
+        ) : (
+          <ContactCommonForm
+            {...{ contactList, setContactList, setIsStep2Visible }}
+          />
+        )}
       </div>
     </>
   );

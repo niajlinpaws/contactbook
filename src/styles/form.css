@@ -139,7 +139,7 @@ body {
 } */
 .container {
   position: relative;
-  max-width: 900px;
+  /* max-width: 900px; */
   width: 100%;
   border-radius: 6px;
   padding: 15px;
@@ -166,7 +166,7 @@ body {
 .container form {
   position: relative;
   margin-top: 16px;
-  min-height: 490px;
+  min-height: 80vh;
   background-color: #fff;
   overflow: hidden;
 }
@@ -250,7 +250,7 @@ select {
   outline: none;
   color: #fff;
   border-radius: 5px;
-  margin: 25px 0;
+  margin: 25px 0 0;
   background-color: #4070f4;
   transition: all 0.3s linear;
   cursor: pointer;
@@ -294,8 +294,4 @@ form .buttons button,
   form .fields .input-field {
     width: 100%;
   }
-}
-
-dialog:modal {
-  max-width: 100vw;
 }

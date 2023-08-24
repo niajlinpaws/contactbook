@@ -69,6 +69,7 @@ function AddForm({ contactModalData, hideContactDialog, setContactListData }) {
                 <input
                   name="name"
                   onChange={(e) => onChange(e)}
+                  // pattern="[a-zA-Z]"
                   placeholder="Enter your name"
                   required
                   type="text"
@@ -93,7 +94,7 @@ function AddForm({ contactModalData, hideContactDialog, setContactListData }) {
                   name="dateOfAnniversary"
                   onChange={onChange}
                   placeholder="Enter anniversary date"
-                  required
+                  // required
                   type="date"
                   value={formData.dateOfAnniversary}
                 />
