@@ -261,7 +261,11 @@ export default function AddContact() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:hidden">
               {contactList.length ? (
                 contactList.map((contact, i) => (
-                  <MobileCard data={contactList[i]} i={i} key={contact.name} />
+                  <MobileCard
+                    data={contactList[i]}
+                    i={i}
+                    key={contact.name + i}
+                  />
                 ))
               ) : (
                 <p className="text-black mt-10 text-center">

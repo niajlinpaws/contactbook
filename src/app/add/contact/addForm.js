@@ -8,8 +8,8 @@ import '../../../styles/form.css';
 
 function AddForm({ contactModalData, hideContactDialog, setContactListData }) {
   const [formData, setFormData] = useState({
-    contactNo: contactModalData.contactNo || '',
-    dateOfAnniversary: contactModalData.dateOfAnniversary || '',
+    contactNumber: contactModalData.contactNumber || '',
+    dateOfMarriage: contactModalData.dateOfMarriage || '',
     dateOfBirth: contactModalData.dateOfBirth || '',
     gender: contactModalData.gender || '',
     name: contactModalData.name || '',
@@ -67,6 +67,7 @@ function AddForm({ contactModalData, hideContactDialog, setContactListData }) {
               <div className="input-field">
                 <label>Full Name</label>
                 <input
+                  minLength={5}
                   name="name"
                   onChange={(e) => onChange(e)}
                   // pattern="[a-zA-Z]"
@@ -88,30 +89,27 @@ function AddForm({ contactModalData, hideContactDialog, setContactListData }) {
                 />
               </div>
               <div className="input-field">
-                <label>Date of Anniversary</label>
+                <label>Date of Marriage</label>
                 <input
                   disabled={''}
-                  name="dateOfAnniversary"
+                  name="dateOfMarriage"
                   onChange={onChange}
-                  placeholder="Enter anniversary date"
+                  placeholder="Enter marriage date"
                   // required
                   type="date"
-                  value={formData.dateOfAnniversary}
+                  value={formData.dateOfMarriage}
                 />
               </div>
-              {/* <div className="input-field">
-                <label>Email</label>
-                <input type="text" placeholder="Enter your email" required />
-              </div> */}
               <div className="input-field">
                 <label>Mobile Number</label>
                 <input
-                  name="contactNo"
+                  name="contactNumber"
                   onChange={onChange}
+                  minLength={10}
                   placeholder="Enter mobile number"
                   required
-                  type="number"
-                  value={formData.contactNo}
+                  type="tel"
+                  value={formData.contactNumber}
                 />
               </div>
               <div className="input-field">
@@ -125,8 +123,8 @@ function AddForm({ contactModalData, hideContactDialog, setContactListData }) {
                   <option disabled value="">
                     Select gender
                   </option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
                   <option value="others">Others</option>
                 </select>
               </div>
@@ -136,7 +134,7 @@ function AddForm({ contactModalData, hideContactDialog, setContactListData }) {
                   name="occupation"
                   onChange={onChange}
                   placeholder="Enter your occupation"
-                  required
+                  // required
                   type="text"
                   value={formData.occupation}
                 />
