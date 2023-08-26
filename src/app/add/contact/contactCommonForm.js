@@ -64,6 +64,8 @@ const ContactCommonForm = ({ contactList, setIsStep2Visible }) => {
         alert('Oops! Something went wrong.');
       }
 
+      alert('Contact added successfully');
+      // if (res === '')
       console.log('🚀 ~ file: contactCommonForm.js:53 ~ onSubmit ~ res:', res);
     }
 
