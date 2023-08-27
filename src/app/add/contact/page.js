@@ -2,8 +2,12 @@
 
 import { useEffect, useState } from 'react';
 
+import EditIcon from '../../../../public/editButton';
+import Bin from '../../../../public/bin';
+
 import AddForm from './addForm';
 import ContactCommonForm from './contactCommonForm';
+import ContactIcon from '../../../../public/contact';
 
 const displayDate = (date) =>
   Intl.DateTimeFormat('en-IN').format(new Date(date || null));
@@ -25,42 +29,57 @@ export default function AddContact() {
     setContactModalData(null);
   };
   const deleteData = (i) => {
-    // if (confirm('Are you sure you want to delete?'))
-    setContactList((prev) => {
-      const list = prev.splice(0, 1);
+    confirm(`Are you sure you want to remove ${contactList[i].name}?`)
+      ? setContactList((prev) => {
+          const list = prev.splice(0, 1);
 
-      console.log('🚀 ~ file: page.js:32 ~ ?setContactList ~ i:', i, list);
-      localStorage.setItem('listData', JSON.stringify(prev));
+          console.log('🚀 ~ file: page.js:32 ~ ?setContactList ~ i:', i, list);
+          localStorage.setItem('listData', JSON.stringify(prev));
 
-      return prev;
-    });
+          return prev;
+        })
+      : '';
   };
 
   const MobileCard = ({ data, i }) => (
     <div className="bg-white space-y-3 p-4 rounded-lg shadow">
       <div className="flex items-center space-x-2 text-sm">
         <div>
-          <p className="text-blue-500 font-bold capitalize">{data.name}</p>
+          <p
+            className="text-blue-500 font-bold capitalize truncate"
+            style={{ width: '13rem' }}
+          >
+            {data.name}
+          </p>
         </div>
-        <div className="text-gray-500 capitalize">{data.gender}</div>
+
         <div style={{ gap: '10px', display: 'flex', marginLeft: 'auto' }}>
           <span
             className="p-1.5 text-xs font-medium uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50"
             onClick={() => openContactDialog(data, i)}
           >
-            Edit
+            <EditIcon className="w-4 h-4 font-semibold stroke-gray-600 hover:cursor-pointer" />
           </span>
           <span
             className="p-1.5 text-xs font-medium uppercase tracking-wider text-red-800 bg-red-200 rounded-lg bg-opacity-50"
             onClick={() => deleteData(i)}
           >
-            Delete
+            <Bin className="w-4 h-4 font-semibold stroke-gray-600 hover:cursor-pointer" />
           </span>
         </div>
       </div>
-      <div className="text-sm text-gray-700">{data.contactNo}</div>
-      <div className="text-sm font-medium text-black">
-        {displayDate(data.dateOfBirth)}
+      <div
+        className="text-sm text-black"
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          width: '100%',
+        }}
+      >
+        <span>{displayDate(data.dateOfBirth)}</span>
+        <div className="text-sm text-gray-700">{data.contactNumber}</div>
+        <div className="text-gray-500 capitalize">{data.gender}</div>
       </div>
     </div>
   );
@@ -74,7 +93,7 @@ export default function AddContact() {
         {data.gender}
       </td>
       <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-        {data.contactNo}
+        {data.contactNumber}
       </td>
       <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
         {displayDate(data.dateOfBirth)}
@@ -85,13 +104,13 @@ export default function AddContact() {
             className="p-1.5 text-xs font-medium uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50 cursor-pointer"
             onClick={() => openContactDialog(data, i)}
           >
-            Edit
+            <EditIcon className="w-4 h-4 font-semibold stroke-gray-600 hover:cursor-pointer" />
           </span>
           <span
             className="p-1.5 text-xs font-medium uppercase tracking-wider text-red-800 bg-red-200 rounded-lg bg-opacity-50 cursor-pointer"
             onClick={() => deleteData(i)}
           >
-            Delete
+            <Bin className="w-4 h-4 font-semibold stroke-gray-600 hover:cursor-pointer" />
           </span>
         </div>
       </td>
@@ -187,7 +206,16 @@ export default function AddContact() {
       )}
 
       <div className="p-5 h-screen bg-gray-100">
-        <h1 className="text-xl mb-2 text-black">Contact Book</h1>
+        <div
+          style={{
+            alignItems: 'center',
+            display: 'flex',
+            flexDirection: 'row',
+          }}
+        >
+          <ContactIcon className="w-10 h-10 font-semibold stroke-gray-600 hover:cursor-pointer" />
+          <h1 className="text-xl text-black">Contact Book</h1>
+        </div>
         {!isStep2Visible ? (
           <>
             <button

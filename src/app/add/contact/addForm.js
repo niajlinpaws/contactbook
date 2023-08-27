@@ -4,9 +4,16 @@ import { useState } from 'react';
 
 import CloseButton from '../../../../public/closeButton.js';
 
+import calculateAge from '../../../../utils/dateHelper.js';
+
 import '../../../styles/form.css';
 
-function AddForm({ contactModalData, hideContactDialog, setContactListData }) {
+function AddForm({
+  contactModalData,
+  hideContactDialog,
+  isEdit = false,
+  setContactListData,
+}) {
   const [formData, setFormData] = useState({
     contactNumber: contactModalData.contactNumber || '',
     dateOfMarriage: contactModalData.dateOfMarriage || '',
@@ -15,6 +22,12 @@ function AddForm({ contactModalData, hideContactDialog, setContactListData }) {
     name: contactModalData.name || '',
     occupation: contactModalData.occupation || '',
   });
+
+  const isUserAdult = () => {
+    const res = calculateAge(formData.dateOfBirth) >= 18;
+
+    return res;
+  };
   const onSubmit = (e) => {
     e.preventDefault();
     setContactListData((prev) => {
@@ -48,7 +61,7 @@ function AddForm({ contactModalData, hideContactDialog, setContactListData }) {
   return (
     <div className="container">
       <div className="flex justify-between">
-        <header>Registration</header>
+        <header>{isEdit ? 'Edit Contact' : 'Add Family Member'}</header>
         <div onClick={hideContactDialog}>
           <CloseButton className="w-5 h-5 font-semibold stroke-gray-600 hover:cursor-pointer" />
         </div>
@@ -107,7 +120,7 @@ function AddForm({ contactModalData, hideContactDialog, setContactListData }) {
                   onChange={onChange}
                   minLength={10}
                   placeholder="Enter mobile number"
-                  required
+                  required={isUserAdult()}
                   type="tel"
                   value={formData.contactNumber}
                 />
@@ -179,7 +192,7 @@ function AddForm({ contactModalData, hideContactDialog, setContactListData }) {
             </div>
           </div> */}
           <button className="nextBtn">
-            <span className="btnText">Create</span>
+            <span className="btnText">{isEdit ? 'Update' : 'Create'}</span>
             <i className="uil uil-navigator" />
           </button>
         </div>

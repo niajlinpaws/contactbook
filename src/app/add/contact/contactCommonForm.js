@@ -1,3 +1,4 @@
+import { useRouter, usePathname } from 'next/navigation';
 import { useState } from 'react';
 
 import fetchAPI from '../../../../utils/fetchHelper';
@@ -5,6 +6,8 @@ import fetchAPI from '../../../../utils/fetchHelper';
 import '../../../styles/form.css';
 
 const ContactCommonForm = ({ contactList, setIsStep2Visible }) => {
+  const pathname = usePathname();
+  const router = useRouter();
   const [formData, setFormData] = useState({
     address: '',
     email: '',
@@ -14,6 +17,7 @@ const ContactCommonForm = ({ contactList, setIsStep2Visible }) => {
     nativeAddress: '',
     primaryContact: '',
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   const onChange = ({ target: { files, name, value } }) => {
     // console.log('🚀 ~ file: addForm.js:21 ~ onChange ~ name:', name, value);
@@ -27,49 +31,64 @@ const ContactCommonForm = ({ contactList, setIsStep2Visible }) => {
     }));
   };
   const onSubmit = async (e) => {
-    e.preventDefault();
-    const { headOfFamily, primaryContact } = formData;
-    const duplicateContactList = contactList.slice();
-    duplicateContactList[primaryContact] = {
-      ...duplicateContactList[primaryContact],
-      ...formData,
-      isPrimary: true,
-    };
-    delete duplicateContactList[primaryContact].primaryContact;
-    duplicateContactList[headOfFamily] = {
-      ...duplicateContactList[headOfFamily],
-      isHead: true,
-    };
-    console.log(formData, duplicateContactList);
-    const { res, err } = await fetchAPI({
-      endpoint: 'admin/users/check',
-      method: 'POST',
-      payload: {
-        contactNumber: duplicateContactList[primaryContact].contactNumber,
-      },
-    });
-
-    if (err) {
-      alert('Oops! Something went wrong.');
-    }
-
-    if (res === 'Contactnumber Not Found') {
+    try {
+      e.preventDefault();
+      // return router.push('/contact/svjds');
+      setIsLoading(true);
+      const { headOfFamily, primaryContact } = formData;
+      const duplicateContactList = contactList.slice();
+      duplicateContactList[primaryContact] = {
+        ...duplicateContactList[primaryContact],
+        ...formData,
+        isPrimary: true,
+      };
+      delete duplicateContactList[primaryContact].primaryContact;
+      duplicateContactList[headOfFamily] = {
+        ...duplicateContactList[headOfFamily],
+        isHead: true,
+      };
+      console.log(formData, duplicateContactList);
       const { res, err } = await fetchAPI({
-        endpoint: 'admin/users/register',
+        endpoint: 'admin/users/check',
         method: 'POST',
-        payload: { users: duplicateContactList },
+        payload: {
+          contactNumber: duplicateContactList[primaryContact].contactNumber,
+        },
       });
 
       if (err) {
-        alert('Oops! Something went wrong.');
+        return alert('Oops! Something went wrong.');
       }
 
-      alert('Contact added successfully');
-      // if (res === '')
-      console.log('🚀 ~ file: contactCommonForm.js:53 ~ onSubmit ~ res:', res);
-    }
+      if (res === 'Contactnumber Not Found') {
+        const { res, err } = await fetchAPI({
+          endpoint: 'admin/users/register',
+          method: 'POST',
+          payload: { users: duplicateContactList },
+        });
 
-    alert('Primary Contact Number already exists');
+        if (err) {
+          return alert('Oops! Something went wrong.');
+        }
+
+        localStorage.setItem(
+          'listData',
+          JSON.stringify([...contactList, formData]),
+        );
+        alert('Contact added successfully');
+        // if (res === '')
+        console.log(
+          '🚀 ~ file: contactCommonForm.js:53 ~ onSubmit ~ res:',
+          res,
+        );
+        pathname.includes('add') && router.push(`/contact/${'as'}`);
+        return;
+      }
+
+      alert('Primary Contact Number already exists');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -184,6 +203,7 @@ const ContactCommonForm = ({ contactList, setIsStep2Visible }) => {
                   </button> */}
                 {formData.familyPhoto && (
                   <img
+                    alt="familyPhoto"
                     src={formData.familyPhoto}
                     style={{
                       height: 100,
@@ -197,14 +217,20 @@ const ContactCommonForm = ({ contactList, setIsStep2Visible }) => {
             </div>
           </div>
           <div className="buttons">
-            <div className="backBtn" onClick={() => setIsStep2Visible(false)}>
-              <i className="uil uil-navigator"></i>
+            <button
+              className="backBtn"
+              disabled={isLoading}
+              onClick={() => setIsStep2Visible(false)}
+            >
+              <i className="uil uil-navigator" />
               <span className="btnText">Back</span>
-            </div>
+            </button>
 
-            <button className="sumbit" type="submit">
-              <span className="btnText">Submit</span>
-              <i className="uil uil-navigator"></i>
+            <button className="sumbit" disabled={isLoading} type="submit">
+              <span className="btnText">
+                {isLoading ? 'Submitting...' : 'Submit'}
+              </span>
+              <i className="uil uil-navigator" />
             </button>
           </div>
         </div>
