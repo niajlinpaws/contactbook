@@ -1,40 +1,31 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import AddForm from '../../add/contact/addForm';
-import ContactCommonForm from '../../add/contact/contactCommonForm';
+import EditIcon from '../../../public/editButton';
+import Bin from '../../../public/bin';
+import ContactIcon from '../../../public/contact';
 
-import fetchAPI from '../../../../utils/fetchHelper';
-
-import EditIcon from '../../../../public/editButton';
-import Bin from '../../../../public/bin';
-import ContactIcon from '../../../../public/contact';
+import AddForm from '../add/contact/addForm';
+import ContactCommonForm from '../add/contact/contactCommonForm';
+import FilterIcon from '../../../public/filter';
+import SearchContactIcon from '../../../public/searchContact';
+import HeadIcon from '../../../public/headIcon';
+import PrimaryContact from '../../../public/primaryContact';
+import FamilyIcon from '../../../public/familyCount';
+import MobileIcon from '../../../public/mobile';
+import LocationPin from '../../../public/locationPin';
 
 const displayDate = (date) =>
   Intl.DateTimeFormat('en-IN').format(new Date(date || null));
 
-export default function EditContact({ params }) {
+export default function AddContact() {
   const [contactModalData, setContactModalData] = useState(null);
   const [contactList, setContactList] = useState([]);
   const [isStep2Visible, setIsStep2Visible] = useState(false);
-  const commonDetails = useMemo(
-    () => contactList.find((x) => x.isPrimary),
-    [contactList],
-  );
 
   useEffect(() => {
-    const getContactDetail = async () => {
-      const { res, err } = await fetchAPI({
-        endpoint: `admin/users/view/${params.id}?includeFamilyMembers=true`,
-        method: 'GET',
-      });
-      console.log('🚀 ~ file: page.js:26 ~ getContactDetail ~ res:', res);
-
-      if (err || res.message) alert('Oops!, something went wrong.');
-      setContactList(res.users || []);
-    };
-    getContactDetail();
+    setContactList(JSON.parse(localStorage.getItem('listData')) || []);
   }, []);
 
   const openContactDialog = (data, i) => {
@@ -59,18 +50,44 @@ export default function EditContact({ params }) {
 
   const MobileCard = ({ data, i }) => (
     <div className="bg-white space-y-3 p-4 rounded-lg shadow">
-      <div className="flex items-center space-x-2 text-sm">
-        <div>
-          <p
-            className="text-blue-500 font-bold capitalize truncate"
-            style={{ width: '13rem' }}
+      <div className="flex space-x-2 text-base">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div
+            style={{
+              width: '11rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
+            }}
           >
-            {data.name}
-          </p>
+            <HeadIcon className="w-5 h-5 font-semibold stroke-gray-600 hover:cursor-pointer" />
+            <p className="text-blue-500 capitalize truncate">{data.head}</p>
+          </div>
+          <div
+            className="text-black capitalize"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
+              width: '11rem',
+            }}
+          >
+            <PrimaryContact className="w-4 h-4 font-semibold stroke-gray-600 hover:cursor-pointer" />
+            <p className="truncate">{data.primaryContact}</p>
+          </div>
         </div>
 
-        <div style={{ gap: '10px', display: 'flex', marginLeft: 'auto' }}>
-          <span
+        <div
+          style={{
+            gap: '10px',
+            display: 'flex',
+            flexDirection: 'column',
+            marginLeft: 'auto',
+            alignItems: 'flex-end',
+            justifyContent: 'space-between',
+          }}
+        >
+          {/* <span
             className="p-1.5 text-xs font-medium uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50"
             onClick={() => openContactDialog(data, i)}
           >
@@ -81,10 +98,42 @@ export default function EditContact({ params }) {
             onClick={() => deleteData(i)}
           >
             <Bin className="w-4 h-4 font-semibold stroke-gray-600 hover:cursor-pointer" />
-          </span>
+          </span> */}
+          <div
+            className="text-gray-500 capitalize"
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: '4px',
+            }}
+          >
+            <div className="flex items-center">
+              <FamilyIcon className="w-4 h-4 font-semibold stroke-gray-600 hover:cursor-pointer" />
+              <p>{data.members}</p>
+            </div>
+            <p className="truncate font-bold">{data.gotra}</p>
+          </div>
+          <a
+            href={`tel:${data.primaryContactNumber}`}
+            className="text-black flex items-center"
+            style={{ gap: '1px', width: 'fit-content' }}
+          >
+            <MobileIcon className="w-4 h-4 font-semibold stroke-gray-600 hover:cursor-pointer" />
+            {data.primaryContactNumber}
+          </a>
         </div>
       </div>
       <div
+        className="text-base text-gray-700 flex items-start gap-1"
+        style={{ marginTop: '2.5vh' }}
+      >
+        <LocationPin className="w-8 h-7 font-semibold stroke-gray-600 hover:cursor-pointer" />
+        <p className="line-clamp-2" style={{ background: '#e5e7eb96' }}>
+          {data.address}
+        </p>
+      </div>
+      {/* <div
         className="text-sm text-black"
         style={{
           display: 'flex',
@@ -93,10 +142,10 @@ export default function EditContact({ params }) {
           width: '100%',
         }}
       >
-        <span>{displayDate(data.dateOfBirth)}</span>
-        <div className="text-sm text-gray-700">{data.contactNumber}</div>
-        <div className="text-gray-500 capitalize">{data.gender}</div>
-      </div>
+        <span>{data.primaryContact}</span>
+        <div className="text-gray-500 capitalize">{data.gotra}</div>
+        <div className="text-sm text-gray-700">{data.address}</div>
+      </div> */}
     </div>
   );
 
@@ -113,12 +162,6 @@ export default function EditContact({ params }) {
       </td>
       <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
         {displayDate(data.dateOfBirth)}
-      </td>
-      <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-        {displayDate(data.dateOfMarriage)}
-      </td>
-      <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-        {data.occupation || '-'}
       </td>
       <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
         <div style={{ display: 'flex', gap: '20px' }}>
@@ -141,7 +184,7 @@ export default function EditContact({ params }) {
 
   return (
     <>
-      {contactModalData && (
+      {/* {contactModalData && (
         <div
           className="absolute top-0 left-0 w-screen h-screen bg-zinc-700/50 flex flex-col justify-center items-center"
           id="modal-bg"
@@ -150,12 +193,11 @@ export default function EditContact({ params }) {
         >
           <AddForm
             contactModalData={contactModalData}
-            hideContactDialog={hideContactDialog}
-            isEdit={contactModalData.name}
             setContactListData={setContactList}
+            hideContactDialog={hideContactDialog}
           />
         </div>
-      )}
+      )} */}
 
       <div className="p-5 h-screen bg-gray-100">
         <div
@@ -166,42 +208,72 @@ export default function EditContact({ params }) {
           }}
         >
           <ContactIcon className="w-10 h-10 font-semibold stroke-gray-600 hover:cursor-pointer" />
-          <h1 className="text-xl capitalize truncate text-black">{`${
-            commonDetails?.name ? commonDetails?.name + "'s" : ''
-          } Contact Book`}</h1>
+          <h1 className="text-xl text-black">Contact Book</h1>
         </div>
         {!isStep2Visible ? (
           <>
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 roundedfont-bold my-10"
-              onClick={openContactDialog}
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: '5px',
+                margin: '2vh 0',
+              }}
             >
-              Add Contact
-            </button>
+              <div
+                style={{ display: 'flex', position: 'relative', width: '80vw' }}
+              >
+                <div className="input-field" style={{ width: '100%' }}>
+                  <input
+                    name="address"
+                    //   onChange={(e) => onChange(e)}
+                    placeholder="Enter keyword"
+                    required
+                    style={{ width: '100%' }}
+                    type="textarea"
+                    //   value={formData.address}
+                  />
+                </div>
+                <SearchContactIcon
+                  style={{ position: 'absolute', right: '5px', top: '14px' }}
+                  className="w-7 h-7 font-semibold stroke-gray-600 hover:cursor-pointer"
+                />
+              </div>
+              {/* <button
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 roundedfont-bold my-10"
+                onClick={openContactDialog}
+              >
+                Search
+              </button> */}
+              <FilterIcon className="w-8 h-8 font-semibold stroke-gray-600 hover:cursor-pointer" />
+              {/* <button
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 roundedfont-bold my-10"
+                onClick={openContactDialog}
+              >
+                +
+              </button> */}
+              {/* {contactModalData && ( */}
+              {/* )} */}
+            </div>
             <div className="overflow-auto rounded-lg shadow hidden md:block">
               <table className="w-full">
                 <thead className="bg-gray-50 border-b-2 border-gray-200 text-black">
                   <tr>
                     <th className="w-20 p-3 text-sm font-semibold tracking-wide text-left">
-                      Name
+                      Family Head
                     </th>
                     <th className="w-20  p-3 text-sm font-semibold tracking-wide text-left">
-                      Gender
+                      Primary Contact
                     </th>
                     <th className="w-24 p-3 text-sm font-semibold tracking-wide text-left">
-                      Contact No.
+                      Address
                     </th>
                     <th className="w-24 p-3 text-sm font-semibold tracking-wide text-left">
-                      Date of Birth
-                    </th>
-                    <th className="w-24 p-3 text-sm font-semibold tracking-wide text-left">
-                      Date of Marriage
-                    </th>
-                    <th className="w-24 p-3 text-sm font-semibold tracking-wide text-left">
-                      Occupation
+                      Gotra
                     </th>
                     <th className="w-32 p-3 text-sm font-semibold tracking-wide text-left">
-                      Actions
+                      Family Members
                     </th>
                   </tr>
                 </thead>
@@ -211,13 +283,13 @@ export default function EditContact({ params }) {
                       <DesktopCard
                         data={contactList[i]}
                         i={i}
-                        key={contact._id}
+                        key={contact.name}
                       />
                     ))
                   ) : (
                     <tr>
                       <td className="text-black text-center" colSpan={5}>
-                        Loading...
+                        Start adding contacts to show here!
                       </td>
                     </tr>
                   )}
@@ -247,12 +319,35 @@ export default function EditContact({ params }) {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:hidden">
-              {contactList.length ? (
-                contactList.map((contact, i) => (
-                  <MobileCard data={contactList[i]} i={i} key={contact._id} />
+              {[{}].length ? (
+                [
+                  {
+                    head: 'V C Jain',
+                    primaryContact: 'Vipin Jain',
+                    address: 'Shyam Nagar',
+                    gotra: 'Jhanjhari',
+                    members: 6,
+                  },
+                  {},
+                ].map((contact, i) => (
+                  <MobileCard
+                    data={{
+                      head: 'Shri Vimal Chand Jhanjhari',
+                      primaryContact: 'Vipin Jain',
+                      primaryContactNumber: '1234567890',
+                      address:
+                        'C-118, near my own school, shri ram marg, Shyam Nagar, Jaipur - 302019',
+                      gotra: 'Jhanjhari',
+                      members: 6,
+                    }}
+                    i={i}
+                    key={contact.head + i}
+                  />
                 ))
               ) : (
-                <p className="text-black mt-10 text-center">Loading...</p>
+                <p className="text-black mt-10 text-center">
+                  Start adding contacts to show here!
+                </p>
               )}
             </div>
             {contactList.length && (
@@ -261,18 +356,14 @@ export default function EditContact({ params }) {
                   className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 roundedfont-bold my-10"
                   onClick={() => setIsStep2Visible(true)}
                 >
-                  Update Common Details
+                  Proceed to next step
                 </button>
               </div>
             )}
           </>
         ) : (
           <ContactCommonForm
-            {...{
-              contactList,
-              isEdit: true,
-              setIsStep2Visible,
-            }}
+            {...{ contactList, setContactList, setIsStep2Visible }}
           />
         )}
       </div>

@@ -5,8 +5,12 @@ import { useState } from 'react';
 import CloseButton from '../../../../public/closeButton.js';
 
 import calculateAge from '../../../../utils/dateHelper.js';
+import fetchAPI from '../../../../utils/fetchHelper.js';
 
 import '../../../styles/form.css';
+
+const displayDateInInput = (date) =>
+  date ? new Date(date).toISOString().substring(0, 10) : null;
 
 function AddForm({
   contactModalData,
@@ -16,23 +20,44 @@ function AddForm({
 }) {
   const [formData, setFormData] = useState({
     contactNumber: contactModalData.contactNumber || '',
-    dateOfMarriage: contactModalData.dateOfMarriage || '',
-    dateOfBirth: contactModalData.dateOfBirth || '',
+    dateOfMarriage: displayDateInInput(contactModalData.dateOfMarriage) || '',
+    dateOfBirth: displayDateInInput(contactModalData.dateOfBirth) || '',
     gender: contactModalData.gender || '',
     name: contactModalData.name || '',
     occupation: contactModalData.occupation || '',
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   const isUserAdult = () => {
     const res = calculateAge(formData.dateOfBirth) >= 18;
 
     return res;
   };
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
+
+    if (isEdit) {
+      setIsLoading(true);
+      const { res } = await fetchAPI({
+        endpoint: 'admin/users/edit/data',
+        method: 'POST',
+        payload: { ...formData, id: contactModalData._id },
+      });
+
+      if (res.message !== 'User edit successfully') {
+        setIsLoading(false);
+        return alert('Oops! something went wrong.');
+      }
+    }
+
     setContactListData((prev) => {
-      contactModalData.i && prev.splice(contactModalData.i, 1, formData);
-      prev = contactModalData.i ? prev : [...prev, formData];
+      contactModalData.i > -1 && prev.splice(contactModalData.i, 1, formData);
+      prev = contactModalData.i > -1 ? prev : [...prev, formData];
+
+      console.log(
+        '🚀 ~ file: addForm.js:37 ~ setContactListData ~ prev:',
+        prev,
+      );
       localStorage.setItem('listData', JSON.stringify(prev));
 
       return prev;
@@ -119,6 +144,8 @@ function AddForm({
                   name="contactNumber"
                   onChange={onChange}
                   minLength={10}
+                  maxLength={10}
+                  pattern="[0-9]+"
                   placeholder="Enter mobile number"
                   required={isUserAdult()}
                   type="tel"
@@ -191,7 +218,7 @@ function AddForm({
               </div>
             </div>
           </div> */}
-          <button className="nextBtn">
+          <button className="nextBtn" disabled={isLoading}>
             <span className="btnText">{isEdit ? 'Update' : 'Create'}</span>
             <i className="uil uil-navigator" />
           </button>

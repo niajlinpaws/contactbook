@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 
 import EditIcon from '../../../../public/editButton';
 import Bin from '../../../../public/bin';
@@ -22,67 +22,78 @@ export default function AddContact() {
   }, []);
 
   const openContactDialog = (data, i) => {
-    setContactModalData({ ...data, i });
+    console.log('🚀 ~ file: page.js:29 ~ openContactDialog ~ i:', i);
+    setContactModalData(i > -1 ? { ...data, i } : {});
     // document.getElementById('contactModal').showModal();
   };
+
   const hideContactDialog = () => {
     setContactModalData(null);
   };
   const deleteData = (i) => {
     confirm(`Are you sure you want to remove ${contactList[i].name}?`)
       ? setContactList((prev) => {
-          const list = prev.splice(0, 1);
+          // const list =
+          prev.splice(i, 1);
 
-          console.log('🚀 ~ file: page.js:32 ~ ?setContactList ~ i:', i, list);
+          console.log('🚀 ~ file: page.js:32 ~ ?setContactList ~ i:', i, prev);
           localStorage.setItem('listData', JSON.stringify(prev));
 
           return prev;
         })
       : '';
+    // setTimeout(() => {
+    //   console.log(
+    //     '🚀 ~ file: page.js:48 ~ setTimeout ~ contactList:',
+    //     contactList,
+    //   );
+    // }, 0);
   };
 
-  const MobileCard = ({ data, i }) => (
-    <div className="bg-white space-y-3 p-4 rounded-lg shadow">
-      <div className="flex items-center space-x-2 text-sm">
-        <div>
-          <p
-            className="text-blue-500 font-bold capitalize truncate"
-            style={{ width: '13rem' }}
-          >
-            {data.name}
-          </p>
-        </div>
+  const MobileCard = memo(function card({ data, i }) {
+    return (
+      <div className="bg-white space-y-3 p-4 rounded-lg shadow">
+        <div className="flex items-center space-x-2 text-sm">
+          <div>
+            <p
+              className="text-blue-500 font-bold capitalize truncate"
+              style={{ width: '13rem' }}
+            >
+              {data.name}
+            </p>
+          </div>
 
-        <div style={{ gap: '10px', display: 'flex', marginLeft: 'auto' }}>
-          <span
-            className="p-1.5 text-xs font-medium uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50"
-            onClick={() => openContactDialog(data, i)}
-          >
-            <EditIcon className="w-4 h-4 font-semibold stroke-gray-600 hover:cursor-pointer" />
-          </span>
-          <span
-            className="p-1.5 text-xs font-medium uppercase tracking-wider text-red-800 bg-red-200 rounded-lg bg-opacity-50"
-            onClick={() => deleteData(i)}
-          >
-            <Bin className="w-4 h-4 font-semibold stroke-gray-600 hover:cursor-pointer" />
-          </span>
+          <div style={{ gap: '10px', display: 'flex', marginLeft: 'auto' }}>
+            <span
+              className="p-1.5 text-xs font-medium uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50"
+              onClick={() => openContactDialog(data, i)}
+            >
+              <EditIcon className="w-4 h-4 font-semibold stroke-gray-600 hover:cursor-pointer" />
+            </span>
+            <span
+              className="p-1.5 text-xs font-medium uppercase tracking-wider text-red-800 bg-red-200 rounded-lg bg-opacity-50"
+              onClick={() => deleteData(i)}
+            >
+              <Bin className="w-4 h-4 font-semibold stroke-gray-600 hover:cursor-pointer" />
+            </span>
+          </div>
+        </div>
+        <div
+          className="text-sm text-black"
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            width: '100%',
+          }}
+        >
+          <span>{displayDate(data.dateOfBirth)}</span>
+          <div className="text-sm text-gray-700">{data.contactNumber}</div>
+          <div className="text-gray-500 capitalize">{data.gender}</div>
         </div>
       </div>
-      <div
-        className="text-sm text-black"
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          width: '100%',
-        }}
-      >
-        <span>{displayDate(data.dateOfBirth)}</span>
-        <div className="text-sm text-gray-700">{data.contactNumber}</div>
-        <div className="text-gray-500 capitalize">{data.gender}</div>
-      </div>
-    </div>
-  );
+    );
+  });
 
   const DesktopCard = ({ data, i }) => (
     <tr className="bg-white">

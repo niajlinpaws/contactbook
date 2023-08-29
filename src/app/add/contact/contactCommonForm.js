@@ -1,21 +1,29 @@
 import { useRouter, usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import fetchAPI from '../../../../utils/fetchHelper';
 
 import '../../../styles/form.css';
 
-const ContactCommonForm = ({ contactList, setIsStep2Visible }) => {
+const ContactCommonForm = ({
+  contactList,
+  isEdit = false,
+  setIsStep2Visible,
+}) => {
   const pathname = usePathname();
   const router = useRouter();
+  const commonDetails = useMemo(
+    () => (isEdit ? contactList.find((x) => x.isPrimary) : {}),
+    [isEdit],
+  );
   const [formData, setFormData] = useState({
-    address: '',
-    email: '',
-    familyPhoto: '',
-    gotra: '',
-    headOfFamily: '',
-    nativeAddress: '',
-    primaryContact: '',
+    address: commonDetails.address || '',
+    email: commonDetails.email || '',
+    gotra: commonDetails.gotra || '',
+    headOfFamily: commonDetails.head || '',
+    nativeAddress: commonDetails.nativeAddress || '',
+    picture: commonDetails.picture || '',
+    primaryContact: commonDetails.primaryContact || '',
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -48,6 +56,31 @@ const ContactCommonForm = ({ contactList, setIsStep2Visible }) => {
         isHead: true,
       };
       console.log(formData, duplicateContactList);
+      if (isEdit) {
+        const payload = {
+          ...formData,
+          head: commonDetails.head,
+          primaryContact: commonDetails.primaryContact,
+          newHead: formData.headOfFamily,
+          newPrimaryContact: formData.primaryContact,
+        };
+        console.log(
+          '🚀 ~ file: contactCommonForm.js:58 ~ onSubmit ~ payload:',
+          payload,
+        );
+
+        const { res, err } = await fetchAPI({
+          endpoint: 'admin/users/edit/commonDetail',
+          method: 'POST',
+          payload,
+        });
+
+        if (res.message === 'Common details updated successfully')
+          return alert('Updated Successfully');
+
+        return alert('Oops! something went wrong.');
+      }
+
       const { res, err } = await fetchAPI({
         endpoint: 'admin/users/check',
         method: 'POST',
@@ -67,21 +100,19 @@ const ContactCommonForm = ({ contactList, setIsStep2Visible }) => {
           payload: { users: duplicateContactList },
         });
 
-        if (err) {
+        if (err || res.message) {
           return alert('Oops! Something went wrong.');
         }
 
-        localStorage.setItem(
-          'listData',
-          JSON.stringify([...contactList, formData]),
-        );
+        localStorage.removeItem('listData');
         alert('Contact added successfully');
         // if (res === '')
         console.log(
           '🚀 ~ file: contactCommonForm.js:53 ~ onSubmit ~ res:',
           res,
         );
-        pathname.includes('add') && router.push(`/contact/${'as'}`);
+        pathname.includes('add') &&
+          router.replace(`/contact/${res.find((x) => x.isPrimary)._id}`);
         return;
       }
 
@@ -113,7 +144,7 @@ const ContactCommonForm = ({ contactList, setIsStep2Visible }) => {
                     Select primary contact
                   </option>
                   {contactList.map((contact, i) => (
-                    <option key={i} value={i}>
+                    <option key={i} value={contact._id || i}>
                       {contact.name}
                     </option>
                   ))}
@@ -131,31 +162,33 @@ const ContactCommonForm = ({ contactList, setIsStep2Visible }) => {
                     Select head of family
                   </option>
                   {contactList.map((contact, i) => (
-                    <option key={i} value={i}>
+                    <option key={i} value={contact._id || i}>
                       {contact.name}
                     </option>
                   ))}
                 </select>
               </div>
               <div className="input-field">
-                <label>Local Address</label>
+                <label>Full Address (local)</label>
                 <input
+                  minLength={10}
                   name="address"
                   onChange={(e) => onChange(e)}
-                  placeholder="Enter your local address"
+                  placeholder="Enter your full local address"
                   required
                   type="textarea"
                   value={formData.address}
                 />
               </div>
               <div className="input-field">
-                <label>Native Address</label>
+                <label>Native Town/City</label>
                 <input
+                  minLength={3}
                   name="nativeAddress"
                   onChange={(e) => onChange(e)}
-                  placeholder="Enter your native address"
-                  // required
-                  type="textarea"
+                  placeholder="Enter your native village/town/city"
+                  required
+                  type="text"
                   value={formData.nativeAddress}
                 />
               </div>
@@ -164,6 +197,7 @@ const ContactCommonForm = ({ contactList, setIsStep2Visible }) => {
                 <input
                   name="gotra"
                   onChange={onChange}
+                  pattern="[A-Za-z]+"
                   placeholder="Enter your gotra"
                   required
                   type="text"
@@ -187,7 +221,7 @@ const ContactCommonForm = ({ contactList, setIsStep2Visible }) => {
                   accept="image/*"
                   // hidden
                   id="familyPhoto"
-                  name="familyPhoto"
+                  name="picture"
                   onChange={onChange}
                   placeholder="upload"
                   required
@@ -201,7 +235,7 @@ const ContactCommonForm = ({ contactList, setIsStep2Visible }) => {
                   >
                     Upload Family Photo
                   </button> */}
-                {formData.familyPhoto && (
+                {formData.picture && (
                   <img
                     alt="familyPhoto"
                     src={formData.familyPhoto}
@@ -226,7 +260,7 @@ const ContactCommonForm = ({ contactList, setIsStep2Visible }) => {
               <span className="btnText">Back</span>
             </button>
 
-            <button className="sumbit" disabled={isLoading} type="submit">
+            <button className="submit" disabled={isLoading} type="submit">
               <span className="btnText">
                 {isLoading ? 'Submitting...' : 'Submit'}
               </span>

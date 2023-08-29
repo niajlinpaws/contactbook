@@ -278,6 +278,11 @@ form .buttons button,
 .backBtn {
   margin-right: 14px;
 }
+form .buttons button:disabled,
+.backBtn:disabled,
+.nextBtn:disabled {
+  opacity: 0.5;
+}
 
 @media (max-width: 750px) {
   .container form {
