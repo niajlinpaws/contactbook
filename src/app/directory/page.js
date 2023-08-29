@@ -125,7 +125,7 @@ export default function AddContact() {
         </div>
       </div>
       <div
-        className="text-base text-gray-700 flex items-start gap-1"
+        className="text-sm text-gray-700 flex items-start gap-1"
         style={{ marginTop: '2.5vh' }}
       >
         <LocationPin className="w-8 h-7 font-semibold stroke-gray-600 hover:cursor-pointer" />
@@ -350,7 +350,7 @@ export default function AddContact() {
                 </p>
               )}
             </div>
-            {contactList.length && (
+            {!!contactList.length && (
               <div style={{ display: 'flex', justifyContent: 'center' }}>
                 <button
                   className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 roundedfont-bold my-10"
