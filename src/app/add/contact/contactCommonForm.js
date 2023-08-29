@@ -31,7 +31,7 @@ const ContactCommonForm = ({
     // console.log('🚀 ~ file: addForm.js:21 ~ onChange ~ name:', name, value);
     setFormData((prev) => ({
       ...prev,
-      ...(name === 'familyPhoto'
+      ...(name === 'picture'
         ? files[0].type.includes('image')
           ? { [name]: URL.createObjectURL(files[0]) }
           : alert('Unsupported format')
@@ -112,7 +112,7 @@ const ContactCommonForm = ({
           res,
         );
         pathname.includes('add') &&
-          router.replace(`/contact/${res.find((x) => x.isPrimary)._id}`);
+          router.replace(`/contact/${res.users.find((x) => x.isPrimary)._id}`);
         return;
       }
 
@@ -238,7 +238,7 @@ const ContactCommonForm = ({
                 {formData.picture && (
                   <img
                     alt="familyPhoto"
-                    src={formData.familyPhoto}
+                    src={formData.picture}
                     style={{
                       height: 100,
                       marginRight: '1em',
