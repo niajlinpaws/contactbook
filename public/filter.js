@@ -1,9 +1,10 @@
-function FilterIcon({ className }) {
+function FilterIcon({ className, onClick }) {
   return (
     <svg
       className={className}
       fill="none"
       height="800"
+      onClick={onClick}
       viewBox="0 0 24 24"
       width="800"
       xmlns="http://www.w3.org/2000/svg"

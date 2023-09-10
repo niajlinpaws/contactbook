@@ -35,18 +35,25 @@ function AddForm({
   };
   const onSubmit = async (e) => {
     e.preventDefault();
-
+    if (formData.dateOfBirth.startsWith('2023')) {
+      if (!confirm('Are you sure you want to set your year of Birth to 2023?'))
+        return;
+    }
+    // TODO: failing if same user edited twice
     if (isEdit) {
       setIsLoading(true);
       const { res } = await fetchAPI({
-        endpoint: 'admin/users/edit/data',
+        endpoint: 'admin/users/add/data',
         method: 'POST',
-        payload: { ...formData, id: contactModalData._id },
+        payload: JSON.stringify({
+          ...formData,
+          primaryContact: contactModalData.primaryContactId,
+        }),
       });
 
-      if (res.message !== 'User edit successfully') {
+      if (res.message !== 'User added successfully') {
         setIsLoading(false);
-        return alert('Oops! something went wrong.');
+        return alert('Oops! something went wrong. Please try again.');
       }
     }
 
@@ -58,7 +65,7 @@ function AddForm({
         '🚀 ~ file: addForm.js:37 ~ setContactListData ~ prev:',
         prev,
       );
-      localStorage.setItem('listData', JSON.stringify(prev));
+      if (!isEdit) localStorage.setItem('listData', JSON.stringify(prev));
 
       return prev;
     });
@@ -86,7 +93,11 @@ function AddForm({
   return (
     <div className="container">
       <div className="flex justify-between">
-        <header>{isEdit ? 'Edit Contact' : 'Add Family Member'}</header>
+        <header>
+          {isEdit && contactModalData.name
+            ? 'Edit Contact'
+            : 'Add Family Member'}
+        </header>
         <div onClick={hideContactDialog}>
           <CloseButton className="w-5 h-5 font-semibold stroke-gray-600 hover:cursor-pointer" />
         </div>
@@ -118,6 +129,7 @@ function AddForm({
               <div className="input-field">
                 <label>Date of Birth</label>
                 <input
+                  max={displayDateInInput(new Date())}
                   name="dateOfBirth"
                   onChange={onChange}
                   placeholder="Enter birth date"
@@ -219,7 +231,9 @@ function AddForm({
             </div>
           </div> */}
           <button className="nextBtn" disabled={isLoading}>
-            <span className="btnText">{isEdit ? 'Update' : 'Create'}</span>
+            <span className="btnText">
+              {isEdit && contactModalData.name ? 'Update' : 'Create'}
+            </span>
             <i className="uil uil-navigator" />
           </button>
         </div>

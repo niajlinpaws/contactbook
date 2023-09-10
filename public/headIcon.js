@@ -1,7 +1,7 @@
 function HeadIcon({ className }) {
   return (
     <svg
-      ariaHidden="true"
+      aria-hidden="true"
       className={className + ' iconify iconify--noto'}
       height="800"
       viewBox="0 0 128 128"

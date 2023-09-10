@@ -5,9 +5,6 @@ import { useEffect, useState } from 'react';
 import EditIcon from '../../../public/editButton';
 import Bin from '../../../public/bin';
 import ContactIcon from '../../../public/contact';
-
-import AddForm from '../add/contact/addForm';
-import ContactCommonForm from '../add/contact/contactCommonForm';
 import FilterIcon from '../../../public/filter';
 import SearchContactIcon from '../../../public/searchContact';
 import HeadIcon from '../../../public/headIcon';
@@ -16,78 +13,144 @@ import FamilyIcon from '../../../public/familyCount';
 import MobileIcon from '../../../public/mobile';
 import LocationPin from '../../../public/locationPin';
 
+import FilterModal from './filterModal';
+
+import fetchAPI from '../../../utils/fetchHelper';
+import { FamilyDetailsModal, genderTextStyle } from './familyDetailsModal';
+
 const displayDate = (date) =>
   Intl.DateTimeFormat('en-IN').format(new Date(date || null));
 
-export default function AddContact() {
+export default function Directory() {
   const [contactModalData, setContactModalData] = useState(null);
+  const [filterModalData, setFilterModalData] = useState({
+    data: '',
+    search: false,
+    visible: false,
+  });
   const [contactList, setContactList] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [isStep2Visible, setIsStep2Visible] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setContactList(JSON.parse(localStorage.getItem('listData')) || []);
-  }, []);
+    async function getUsersData() {
+      try {
+        const { res, err } = await fetchAPI({
+          endpoint: 'admin/users/find/',
+          method: 'POST',
+        });
 
+        console.log('🚀 ~ file: page.js:32 ~ getUsersData ~ res:', res);
+        if (res.data) {
+          return setContactList(res);
+        }
+
+        alert('Oops! something went wrong. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    }
+    getUsersData();
+  }, []);
+  useEffect(() => {
+    filterModalData.search && getSearchResults();
+  }, [filterModalData.search]);
+
+  const onChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
   const openContactDialog = (data, i) => {
+    document.body.style.overflow = 'hidden';
     setContactModalData({ ...data, i });
     // document.getElementById('contactModal').showModal();
   };
   const hideContactDialog = () => {
+    document.body.style.overflow = 'scroll';
     setContactModalData(null);
   };
-  const deleteData = (i) => {
-    confirm(`Are you sure you want to remove ${contactList[i].name}?`)
-      ? setContactList((prev) => {
-          const list = prev.splice(0, 1);
+  const getSearchResults = async () => {
+    // if (searchQuery.trim()) {
+    setContactList([]);
+    setLoading(true);
 
-          console.log('🚀 ~ file: page.js:32 ~ ?setContactList ~ i:', i, list);
-          localStorage.setItem('listData', JSON.stringify(prev));
+    const { res, err } = await fetchAPI({
+      endpoint: 'admin/users/find',
+      method: 'POST',
+      payload: JSON.stringify({
+        searchFields: filterModalData.data.includes('includeFamilyMembers')
+          ? ''
+          : filterModalData.data,
+        'search[value]': searchQuery,
+      }),
+    });
 
-          return prev;
-        })
-      : '';
+    setLoading(false);
+
+    if (!err) {
+      setContactList(res);
+    }
+
+    // setIsStep2Visible(false);
+    // }
+
+    setFilterModalData((prev) => ({ ...prev, search: false }));
   };
 
-  const MobileCard = ({ data, i }) => (
-    <div className="bg-white space-y-3 p-4 rounded-lg shadow">
-      <div className="flex space-x-2 text-base">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <div
-            style={{
-              width: '11rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '5px',
-            }}
-          >
-            <HeadIcon className="w-5 h-5 font-semibold stroke-gray-600 hover:cursor-pointer" />
-            <p className="text-blue-500 capitalize truncate">{data.head}</p>
-          </div>
-          <div
-            className="text-black capitalize"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '5px',
-              width: '11rem',
-            }}
-          >
-            <PrimaryContact className="w-4 h-4 font-semibold stroke-gray-600 hover:cursor-pointer" />
-            <p className="truncate">{data.primaryContact}</p>
-          </div>
-        </div>
+  const MobileCard = ({ data, i }) => {
+    // console.log('🚀 ~ file: page.js:73 ~ MobileCard ~ data:', data);
 
-        <div
-          style={{
-            gap: '10px',
-            display: 'flex',
-            flexDirection: 'column',
-            marginLeft: 'auto',
-            alignItems: 'flex-end',
-            justifyContent: 'space-between',
-          }}
-        >
-          {/* <span
+    return (
+      <div className="bg-white space-y-3 p-4 rounded-lg shadow">
+        <div className="flex space-x-2 text-base">
+          <div
+            onClick={() => openContactDialog(data)}
+            style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}
+          >
+            <div
+              style={{
+                width: '11rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+              }}
+            >
+              <HeadIcon className="w-5 h-5 font-semibold stroke-gray-600 hover:cursor-pointer" />
+              <p
+                className={`${genderTextStyle(
+                  data.head.gender,
+                )} capitalize truncate`}
+              >
+                {data.head.name}
+              </p>
+            </div>
+            <div
+              className={`${genderTextStyle(
+                data.primaryContact.gender,
+              )} capitalize`}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                width: '11rem',
+              }}
+            >
+              <PrimaryContact className="w-4 h-4 font-semibold stroke-gray-600 hover:cursor-pointer" />
+              <p className="truncate">{data.primaryContact.name}</p>
+            </div>
+          </div>
+
+          <div
+            style={{
+              gap: '10px',
+              display: 'flex',
+              flexDirection: 'column',
+              marginLeft: 'auto',
+              alignItems: 'flex-end',
+              justifyContent: 'space-between',
+            }}
+          >
+            {/* <span
             className="p-1.5 text-xs font-medium uppercase tracking-wider text-green-800 bg-green-200 rounded-lg bg-opacity-50"
             onClick={() => openContactDialog(data, i)}
           >
@@ -99,41 +162,44 @@ export default function AddContact() {
           >
             <Bin className="w-4 h-4 font-semibold stroke-gray-600 hover:cursor-pointer" />
           </span> */}
-          <div
-            className="text-gray-500 capitalize"
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: '4px',
-            }}
-          >
-            <div className="flex items-center">
-              <FamilyIcon className="w-4 h-4 font-semibold stroke-gray-600 hover:cursor-pointer" />
-              <p>{data.members}</p>
+            <div
+              className="text-gray-500 capitalize"
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: '4px',
+              }}
+            >
+              <div className="flex items-center">
+                <FamilyIcon className="w-4 h-4 font-semibold stroke-gray-600 hover:cursor-pointer" />
+                <p>{data.totalMembers}</p>
+              </div>
+              <p className="truncate font-bold" style={{ maxWidth: '6rem' }}>
+                {data.gotra}
+              </p>
             </div>
-            <p className="truncate font-bold">{data.gotra}</p>
+            <a
+              href={`tel:${data.primaryContact.contactNumber}`}
+              className="text-black flex items-center"
+              style={{ gap: '1px', width: 'fit-content' }}
+            >
+              <MobileIcon className="w-4 h-4 font-semibold stroke-gray-600 hover:cursor-pointer" />
+              {data.primaryContact.contactNumber}
+            </a>
           </div>
-          <a
-            href={`tel:${data.primaryContactNumber}`}
-            className="text-black flex items-center"
-            style={{ gap: '1px', width: 'fit-content' }}
-          >
-            <MobileIcon className="w-4 h-4 font-semibold stroke-gray-600 hover:cursor-pointer" />
-            {data.primaryContactNumber}
-          </a>
         </div>
-      </div>
-      <div
-        className="text-sm text-gray-700 flex items-start gap-1"
-        style={{ marginTop: '2.5vh' }}
-      >
-        <LocationPin className="w-8 h-7 font-semibold stroke-gray-600 hover:cursor-pointer" />
-        <p className="line-clamp-2" style={{ background: '#e5e7eb96' }}>
-          {data.address}
-        </p>
-      </div>
-      {/* <div
+        <div
+          className="text-sm text-gray-700 flex items-start gap-1"
+          onClick={() => openContactDialog(data)}
+          style={{ marginTop: '2.5vh' }}
+        >
+          <LocationPin className="w-8 h-7 font-semibold stroke-gray-600 hover:cursor-pointer" />
+          <p className="line-clamp-2" style={{ background: '#e5e7eb96' }}>
+            {data.address}
+          </p>
+        </div>
+        {/* <div
         className="text-sm text-black"
         style={{
           display: 'flex',
@@ -146,22 +212,28 @@ export default function AddContact() {
         <div className="text-gray-500 capitalize">{data.gotra}</div>
         <div className="text-sm text-gray-700">{data.address}</div>
       </div> */}
-    </div>
-  );
+      </div>
+    );
+  };
 
   const DesktopCard = ({ data, i }) => (
     <tr className="bg-white">
-      <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-        <p className="font-bold text-blue-500 capitalize">{data.name}</p>
+      <td className="p-3 text-sm text-gray-700">
+        <HeadIcon className="w-5 h-5 font-semibold stroke-gray-600 hover:cursor-pointer" />
+        <p
+          className={`font-bold ${
+            data.gender === 'Male' ? 'text-blue-500' : 'text-pink-500'
+          } capitalize`}
+        >
+          {data.name}
+        </p>
       </td>
-      <td className="p-3 text-sm text-gray-700 whitespace-nowrap capitalize">
-        {data.gender}
-      </td>
-      <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+      <td className="p-3 text-sm text-gray-700 capitalize">
         {data.contactNumber}
       </td>
-      <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
-        {displayDate(data.dateOfBirth)}
+      <td className="p-3 text-sm text-gray-700">{data.occupation || '-'}</td>
+      {/* <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+        {'{displayDate(data.dateOfBirth)}'}
       </td>
       <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
         <div style={{ display: 'flex', gap: '20px' }}>
@@ -178,28 +250,38 @@ export default function AddContact() {
             <Bin className="w-4 h-4 font-semibold stroke-gray-600 hover:cursor-pointer" />
           </span>
         </div>
-      </td>
+      </td> */}
     </tr>
   );
 
   return (
     <>
-      {/* {contactModalData && (
+      {contactModalData && (
+        <div
+          className="fixed top-0 left-0 w-screen h-screen bg-zinc-700/50 flex flex-col items-center"
+          id="modal-bg"
+          style={{ padding: '0 15px', zIndex: 1 }}
+        >
+          <FamilyDetailsModal
+            data={contactModalData}
+            hideContactDialog={hideContactDialog}
+          />
+        </div>
+      )}
+      {filterModalData.visible && (
         <div
           className="absolute top-0 left-0 w-screen h-screen bg-zinc-700/50 flex flex-col justify-center items-center"
           id="modal-bg"
           style={{ padding: '0 15px' }}
-          //   onClick={hideContactDialog}
         >
-          <AddForm
-            contactModalData={contactModalData}
-            setContactListData={setContactList}
-            hideContactDialog={hideContactDialog}
+          <FilterModal
+            data={filterModalData}
+            setFilterModalData={setFilterModalData}
           />
         </div>
-      )} */}
+      )}
 
-      <div className="p-5 h-screen bg-gray-100">
+      <div className="p-5 min-h-screen bg-gray-100">
         <div
           style={{
             alignItems: 'center',
@@ -226,19 +308,21 @@ export default function AddContact() {
               >
                 <div className="input-field" style={{ width: '100%' }}>
                   <input
-                    name="address"
-                    //   onChange={(e) => onChange(e)}
+                    name="search"
+                    onChange={(e) => onChange(e)}
                     placeholder="Enter keyword"
                     required
                     style={{ width: '100%' }}
-                    type="textarea"
-                    //   value={formData.address}
+                    type="text"
+                    value={searchQuery}
                   />
                 </div>
-                <SearchContactIcon
-                  style={{ position: 'absolute', right: '5px', top: '14px' }}
-                  className="w-7 h-7 font-semibold stroke-gray-600 hover:cursor-pointer"
-                />
+                <div onClick={getSearchResults}>
+                  <SearchContactIcon
+                    className="w-7 h-7 font-semibold stroke-gray-600 hover:cursor-pointer"
+                    style={{ position: 'absolute', right: '5px', top: '14px' }}
+                  />
+                </div>
               </div>
               {/* <button
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 roundedfont-bold my-10"
@@ -246,7 +330,12 @@ export default function AddContact() {
               >
                 Search
               </button> */}
-              <FilterIcon className="w-8 h-8 font-semibold stroke-gray-600 hover:cursor-pointer" />
+              <FilterIcon
+                onClick={() =>
+                  setFilterModalData((prev) => ({ ...prev, visible: true }))
+                }
+                className="w-8 h-8 font-semibold stroke-gray-600 hover:cursor-pointer"
+              />
               {/* <button
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 roundedfont-bold my-10"
                 onClick={openContactDialog}
@@ -289,7 +378,7 @@ export default function AddContact() {
                   ) : (
                     <tr>
                       <td className="text-black text-center" colSpan={5}>
-                        Start adding contacts to show here!
+                        No Contact Found
                       </td>
                     </tr>
                   )}
@@ -319,52 +408,40 @@ export default function AddContact() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:hidden">
-              {[{}].length ? (
-                [
-                  {
-                    head: 'V C Jain',
-                    primaryContact: 'Vipin Jain',
-                    address: 'Shyam Nagar',
-                    gotra: 'Jhanjhari',
-                    members: 6,
-                  },
-                  {},
-                ].map((contact, i) => (
-                  <MobileCard
-                    data={{
-                      head: 'Shri Vimal Chand Jhanjhari',
-                      primaryContact: 'Vipin Jain',
-                      primaryContactNumber: '1234567890',
-                      address:
-                        'C-118, near my own school, shri ram marg, Shyam Nagar, Jaipur - 302019',
-                      gotra: 'Jhanjhari',
-                      members: 6,
-                    }}
-                    i={i}
-                    key={contact.head + i}
-                  />
-                ))
-              ) : (
-                <p className="text-black mt-10 text-center">
-                  Start adding contacts to show here!
-                </p>
-              )}
+              {!loading &&
+                (contactList.data?.length ? (
+                  contactList.data.map((contact, i) => (
+                    <MobileCard
+                      data={contact}
+                      i={i}
+                      key={contact.primaryContact._id}
+                    />
+                  ))
+                ) : (
+                  <p className="text-black mt-10 text-center">
+                    No Contact Found
+                  </p>
+                ))}
             </div>
-            {!!contactList.length && (
-              <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <button
+            {loading && (
+              <div
+                style={{
+                  color: 'black',
+                  display: 'flex',
+                  justifyContent: 'center',
+                }}
+              >
+                {/* <button
                   className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 roundedfont-bold my-10"
                   onClick={() => setIsStep2Visible(true)}
-                >
-                  Proceed to next step
-                </button>
+                > */}
+                Fetching Contacts...
+                {/* </button> */}
               </div>
             )}
           </>
         ) : (
-          <ContactCommonForm
-            {...{ contactList, setContactList, setIsStep2Visible }}
-          />
+          'Fetching Contacts...'
         )}
       </div>
     </>

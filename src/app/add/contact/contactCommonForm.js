@@ -1,6 +1,7 @@
 import { useRouter, usePathname } from 'next/navigation';
 import { useMemo, useState } from 'react';
 
+import onFileChange from '../../../../utils/imageHelper';
 import fetchAPI from '../../../../utils/fetchHelper';
 
 import '../../../styles/form.css';
@@ -20,30 +21,45 @@ const ContactCommonForm = ({
     address: commonDetails.address || '',
     email: commonDetails.email || '',
     gotra: commonDetails.gotra || '',
-    headOfFamily: commonDetails.head || '',
+    head: commonDetails.head || '',
     nativeAddress: commonDetails.nativeAddress || '',
     picture: commonDetails.picture || '',
     primaryContact: commonDetails.primaryContact || '',
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const onChange = ({ target: { files, name, value } }) => {
+  const onChange = async (e) => {
+    const {
+      target: { files, name, value },
+    } = e;
     // console.log('🚀 ~ file: addForm.js:21 ~ onChange ~ name:', name, value);
+    if (name === 'picture') {
+      if (files[0].type.includes('image')) {
+        const file = await onFileChange(e, setFormData);
+
+        console.log(
+          file,
+          '🚀 ~ file: contactCommonForm.js:35 ~ onChange ~ file:',
+          files,
+        );
+        return;
+      }
+
+      return alert('Unsupported format!');
+    }
     setFormData((prev) => ({
       ...prev,
-      ...(name === 'picture'
-        ? files[0].type.includes('image')
-          ? { [name]: URL.createObjectURL(files[0]) }
-          : alert('Unsupported format')
-        : { [name]: value }),
+      [name]: value,
     }));
   };
   const onSubmit = async (e) => {
     try {
       e.preventDefault();
-      // return router.push('/contact/svjds');
       setIsLoading(true);
-      const { headOfFamily, primaryContact } = formData;
+      const { head, primaryContact, picture } = formData;
+
+      if (!picture) return alert('Please add Family photo');
+      // TODO: select headOfFamily and then change to another one - email and native address not getting saved
       const duplicateContactList = contactList.slice();
       duplicateContactList[primaryContact] = {
         ...duplicateContactList[primaryContact],
@@ -51,25 +67,23 @@ const ContactCommonForm = ({
         isPrimary: true,
       };
       delete duplicateContactList[primaryContact].primaryContact;
-      duplicateContactList[headOfFamily] = {
-        ...duplicateContactList[headOfFamily],
+      duplicateContactList[head] = {
+        ...duplicateContactList[head],
         isHead: true,
       };
       console.log(formData, duplicateContactList);
       if (isEdit) {
-        const payload = {
-          ...formData,
-          head: commonDetails.head,
-          primaryContact: commonDetails.primaryContact,
-          newHead: formData.headOfFamily,
-          newPrimaryContact: formData.primaryContact,
-        };
+        const payload = new FormData();
+        for (let key in formData) {
+          payload.append(key, formData[key]);
+        }
         console.log(
           '🚀 ~ file: contactCommonForm.js:58 ~ onSubmit ~ payload:',
           payload,
         );
 
         const { res, err } = await fetchAPI({
+          contentType: {},
           endpoint: 'admin/users/edit/commonDetail',
           method: 'POST',
           payload,
@@ -84,9 +98,9 @@ const ContactCommonForm = ({
       const { res, err } = await fetchAPI({
         endpoint: 'admin/users/check',
         method: 'POST',
-        payload: {
+        payload: JSON.stringify({
           contactNumber: duplicateContactList[primaryContact].contactNumber,
-        },
+        }),
       });
 
       if (err) {
@@ -97,11 +111,11 @@ const ContactCommonForm = ({
         const { res, err } = await fetchAPI({
           endpoint: 'admin/users/register',
           method: 'POST',
-          payload: { users: duplicateContactList },
+          payload: JSON.stringify({ users: duplicateContactList }),
         });
 
         if (err || res.message) {
-          return alert('Oops! Something went wrong.');
+          return alert(res.message || 'Oops! Something went wrong.');
         }
 
         localStorage.removeItem('listData');
@@ -127,7 +141,7 @@ const ContactCommonForm = ({
       <div className="flex justify-between">
         <header>Family Common Details</header>
       </div>
-      <form onSubmit={onSubmit}>
+      <form onSubmit={onSubmit} id="commonDetails">
         <div className="form first">
           <div className="details personal">
             {/* <span className="title">Family Common Details</span> */}
@@ -153,10 +167,10 @@ const ContactCommonForm = ({
               <div className="input-field">
                 <label>Head of Family</label>
                 <select
-                  name="headOfFamily"
+                  name="head"
                   onChange={onChange}
                   required
-                  value={formData.headOfFamily}
+                  value={formData.head}
                 >
                   <option disabled value="">
                     Select head of family
@@ -238,7 +252,12 @@ const ContactCommonForm = ({
                 {formData.picture && (
                   <img
                     alt="familyPhoto"
-                    src={formData.picture}
+                    src={
+                      typeof formData.picture === 'string'
+                        ? 'http://localhost:8000/img/fileupload/' +
+                          formData.picture
+                        : URL.createObjectURL(formData.picture)
+                    }
                     style={{
                       height: 100,
                       marginRight: '1em',

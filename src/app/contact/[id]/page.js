@@ -38,7 +38,7 @@ export default function EditContact({ params }) {
   }, []);
 
   const openContactDialog = (data, i) => {
-    setContactModalData({ ...data, i });
+    setContactModalData({ ...data, i, primaryContactId: commonDetails._id });
     // document.getElementById('contactModal').showModal();
   };
   const hideContactDialog = () => {
@@ -76,12 +76,12 @@ export default function EditContact({ params }) {
           >
             <EditIcon className="w-4 h-4 font-semibold stroke-gray-600 hover:cursor-pointer" />
           </span>
-          <span
+          {/* <span
             className="p-1.5 text-xs font-medium uppercase tracking-wider text-red-800 bg-red-200 rounded-lg bg-opacity-50"
             onClick={() => deleteData(i)}
           >
             <Bin className="w-4 h-4 font-semibold stroke-gray-600 hover:cursor-pointer" />
-          </span>
+          </span> */}
         </div>
       </div>
       <div
@@ -128,12 +128,12 @@ export default function EditContact({ params }) {
           >
             <EditIcon className="w-4 h-4 font-semibold stroke-gray-600 hover:cursor-pointer" />
           </span>
-          <span
+          {/* <span
             className="p-1.5 text-xs font-medium uppercase tracking-wider text-red-800 bg-red-200 rounded-lg bg-opacity-50 cursor-pointer"
             onClick={() => deleteData(i)}
           >
             <Bin className="w-4 h-4 font-semibold stroke-gray-600 hover:cursor-pointer" />
-          </span>
+          </span> */}
         </div>
       </td>
     </tr>
@@ -146,18 +146,17 @@ export default function EditContact({ params }) {
           className="absolute top-0 left-0 w-screen h-screen bg-zinc-700/50 flex flex-col justify-center items-center"
           id="modal-bg"
           style={{ padding: '0 15px' }}
-          //   onClick={hideContactDialog}
         >
           <AddForm
             contactModalData={contactModalData}
             hideContactDialog={hideContactDialog}
-            isEdit={contactModalData.name}
+            isEdit
             setContactListData={setContactList}
           />
         </div>
       )}
 
-      <div className="p-5 h-screen bg-gray-100">
+      <div className="p-5 min-h-screen bg-gray-100">
         <div
           style={{
             alignItems: 'center',
