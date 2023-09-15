@@ -3,8 +3,7 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        destination:
-          'https://encouraging-sneakers-mite.cyclic.cloud/admin/login',
+        destination: 'https://prime-chess-397807.el.r.appspot.com/admin/login',
         permanent: true,
         source: '/',
       },

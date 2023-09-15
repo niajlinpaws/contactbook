@@ -22,10 +22,10 @@ const ContactCommonForm = ({
     address: commonDetails.address || '',
     email: commonDetails.email || '',
     gotra: commonDetails.gotra || '',
-    head: commonDetails.head._id || '',
+    head: commonDetails.head?._id || '',
     nativeAddress: commonDetails.nativeAddress || '',
     picture: commonDetails.picture || '',
-    primaryContact: commonDetails.primaryContact._id || '',
+    primaryContact: commonDetails.primaryContact?._id || '',
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -141,6 +141,7 @@ const ContactCommonForm = ({
         );
         pathname.includes('add') &&
           router.replace(`/contact/${res.users.find((x) => x.isPrimary)._id}`);
+
         return;
       }
 
@@ -253,7 +254,7 @@ const ContactCommonForm = ({
                     name="picture"
                     onChange={onChange}
                     placeholder="upload"
-                    required
+                    required={!formData.picture}
                     type="file"
                     // value={formData.familyPhoto}
                   />

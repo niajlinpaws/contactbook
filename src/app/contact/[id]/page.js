@@ -10,6 +10,7 @@ import fetchAPI from '../../../../utils/fetchHelper';
 import EditIcon from '../../../../public/editButton';
 import Bin from '../../../../public/bin';
 import ContactIcon from '../../../../public/contact';
+import { useRouter } from 'next/navigation';
 
 const displayDate = (date) =>
   Intl.DateTimeFormat('en-IN').format(new Date(date || null));
@@ -22,6 +23,7 @@ export default function EditContact({ params }) {
     () => contactList.find((x) => x.isPrimary),
     [contactList],
   );
+  const router = useRouter();
 
   useEffect(() => {
     const getContactDetail = async () => {
@@ -160,16 +162,22 @@ export default function EditContact({ params }) {
 
       <div className="p-5 min-h-screen bg-gray-100">
         <div
+          onClick={() => router.push('/directory')}
           style={{
             alignItems: 'center',
+            cursor: 'pointer',
             display: 'flex',
             flexDirection: 'row',
           }}
         >
           <ContactIcon className="w-10 h-10 font-semibold stroke-gray-600 hover:cursor-pointer" />
-          <h1 className="text-xl capitalize truncate text-black">{`${
+          <h1 className="text-xl capitalize truncate text-black">
+            {/* {`${
             commonDetails?.name ? commonDetails?.name + "'s" : ''
-          } Contact Book`}</h1>
+          }
+          `} */}
+            Contact Book
+          </h1>
         </div>
         {!isStep2Visible ? (
           <>

@@ -6,28 +6,42 @@ import '../../styles/form.css';
 
 export function FamilyDetailsModal({ children, data, hideContactDialog }) {
   // const primaryContactDetails = useMemo(() => data.users.find(x => x.))
+  const actualFamilyData = data.isCommonDetailsApproved
+    ? data
+    : data.users[0].previousData.isCommonDetailsApprovedAfterRegistration
+    ? data.users[0].previousData
+    : {};
+  // const actualFamilyUsersData = data.users.filter(x => {
 
-  const DesktopCard = ({ contactData, i }) => (
-    <tr className="bg-white">
-      <td className="p-3 text-sm text-gray-700">
-        {data.head._id === contactData._id && (
-          <HeadIcon className="w-5 h-5 font-semibold stroke-gray-600 hover:cursor-pointer" />
-        )}
-        <p
-          className={`font-bold ${genderTextStyle(
-            contactData.gender,
-          )} capitalize`}
-        >
-          {contactData.name}
-        </p>
-      </td>
-      <td className="p-3 text-sm text-gray-700 capitalize">
-        {contactData.contactNumber || '-'}
-      </td>
-      <td className="p-3 text-sm text-gray-700">
-        {contactData.occupation || '-'}
-      </td>
-      {/* <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+  // })
+
+  const DesktopCard = ({ contactData, i }) => {
+    const actualData = contactData.isApproved
+      ? contactData
+      : contactData.previousData;
+
+    return (
+      <tr className="bg-white">
+        <td className="p-3 text-sm text-gray-700">
+          {(actualFamilyData.head._id || actualFamilyData.head) ===
+            actualData._id && (
+            <HeadIcon className="w-5 h-5 font-semibold stroke-gray-600 hover:cursor-pointer" />
+          )}
+          <p
+            className={`font-bold ${genderTextStyle(
+              actualData.gender,
+            )} capitalize`}
+          >
+            {actualData.name}
+          </p>
+        </td>
+        <td className="p-3 text-sm text-gray-700 capitalize">
+          {actualData.contactNumber || '-'}
+        </td>
+        <td className="p-3 text-sm text-gray-700">
+          {actualData.occupation || '-'}
+        </td>
+        {/* <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
             {'{displayDate(data.dateOfBirth)}'}
           </td>
           <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
@@ -46,8 +60,9 @@ export function FamilyDetailsModal({ children, data, hideContactDialog }) {
               </span>
             </div>
           </td> */}
-    </tr>
-  );
+      </tr>
+    );
+  };
 
   return (
     <div
@@ -63,21 +78,25 @@ export function FamilyDetailsModal({ children, data, hideContactDialog }) {
       <div className="form first my-6">
         <div className="details personal">
           <span className="title text-black font-semibold">Address:</span>
-          <span className="text-gray-400 ml-3">{data.address}</span>
+          <span className="text-gray-400 ml-3">{actualFamilyData.address}</span>
         </div>
         <div className="details personal mt-6">
           <span className="title text-black font-semibold">Native Place:</span>
-          <span className="text-gray-400 ml-3">{data.nativeAddress}</span>
+          <span className="text-gray-400 ml-3">
+            {actualFamilyData.nativeAddress}
+          </span>
         </div>
         <div className="details personal mt-6">
           <span className="title text-black font-semibold">Gotra:</span>
-          <span className="text-gray-400 ml-3 capitalize">{data.gotra}</span>
+          <span className="text-gray-400 ml-3 capitalize">
+            {actualFamilyData.gotra}
+          </span>
         </div>
         <div className="details personal mt-6">
           <span className="title text-black font-semibold">Family Photo:</span>
           <img
             className="aspect-video object-contain"
-            src={'https://prime-chess-397807.el.r.appspot.com/' + data.picture}
+            src={actualFamilyData.picture}
           />
         </div>
       </div>
