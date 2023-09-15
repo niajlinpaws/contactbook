@@ -71,13 +71,13 @@ export function FamilyDetailsModal({ children, data, hideContactDialog }) {
         </div>
         <div className="details personal mt-6">
           <span className="title text-black font-semibold">Gotra:</span>
-          <span className="text-gray-400 ml-3">{data.gotra}</span>
+          <span className="text-gray-400 ml-3 capitalize">{data.gotra}</span>
         </div>
         <div className="details personal mt-6">
           <span className="title text-black font-semibold">Family Photo:</span>
           <img
             className="aspect-video object-contain"
-            src={'http://localhost:8000/img/fileupload/' + data.picture}
+            src={'https://prime-chess-397807.el.r.appspot.com/' + data.picture}
           />
         </div>
       </div>

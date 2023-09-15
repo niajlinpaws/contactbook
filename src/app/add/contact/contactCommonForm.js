@@ -5,6 +5,7 @@ import onFileChange from '../../../../utils/imageHelper';
 import fetchAPI from '../../../../utils/fetchHelper';
 
 import '../../../styles/form.css';
+import calculateAge from '../../../../utils/dateHelper';
 
 const ContactCommonForm = ({
   contactList,
@@ -21,10 +22,10 @@ const ContactCommonForm = ({
     address: commonDetails.address || '',
     email: commonDetails.email || '',
     gotra: commonDetails.gotra || '',
-    head: commonDetails.head || '',
+    head: commonDetails.head._id || '',
     nativeAddress: commonDetails.nativeAddress || '',
     picture: commonDetails.picture || '',
-    primaryContact: commonDetails.primaryContact || '',
+    primaryContact: commonDetails.primaryContact._id || '',
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -52,13 +53,22 @@ const ContactCommonForm = ({
       [name]: value,
     }));
   };
+  const isNotAdult = (user, age) => calculateAge(user.dateOfBirth) < age;
   const onSubmit = async (e) => {
     try {
       e.preventDefault();
       setIsLoading(true);
+
       const { head, primaryContact, picture } = formData;
+      const headUser = contactList.find((x) => x._id === head);
+      const primaryUser = contactList.find((x) => x._id === primaryContact);
 
       if (!picture) return alert('Please add Family photo');
+      if (isNotAdult(headUser || contactList[head], 25))
+        return alert('Head contact cannot be younger than 25 years');
+      if (isNotAdult(primaryUser || contactList[primaryContact], 18))
+        return alert('Primary contact cannot be younger than 18 years');
+
       // TODO: select headOfFamily and then change to another one - email and native address not getting saved
       const duplicateContactList = contactList.slice();
       duplicateContactList[primaryContact] = {
@@ -108,10 +118,14 @@ const ContactCommonForm = ({
       }
 
       if (res === 'Contactnumber Not Found') {
+        const payload = new FormData();
+        payload.append('users', JSON.stringify(duplicateContactList));
+        payload.append('picture', formData.picture);
         const { res, err } = await fetchAPI({
+          contentType: {},
           endpoint: 'admin/users/register',
           method: 'POST',
-          payload: JSON.stringify({ users: duplicateContactList }),
+          payload,
         });
 
         if (err || res.message) {
@@ -141,153 +155,154 @@ const ContactCommonForm = ({
       <div className="flex justify-between">
         <header>Family Common Details</header>
       </div>
-      <form onSubmit={onSubmit} id="commonDetails">
-        <div className="form first">
-          <div className="details personal">
-            {/* <span className="title">Family Common Details</span> */}
-            <div className="fields">
-              <div className="input-field">
-                <label>Primary Contact</label>
-                <select
-                  name="primaryContact"
-                  onChange={onChange}
-                  required
-                  value={formData.primaryContact}
-                >
-                  <option disabled value="">
-                    Select primary contact
-                  </option>
-                  {contactList.map((contact, i) => (
-                    <option key={i} value={contact._id || i}>
-                      {contact.name}
+      <fieldset disabled={isLoading}>
+        <form onSubmit={onSubmit} id="commonDetails">
+          <div className="form first">
+            <div className="details personal">
+              {/* <span className="title">Family Common Details</span> */}
+              <div className="fields">
+                <div className="input-field">
+                  <label>Primary Contact</label>
+                  <select
+                    name="primaryContact"
+                    onChange={onChange}
+                    required
+                    value={formData.primaryContact}
+                  >
+                    <option disabled value="">
+                      Select primary contact
                     </option>
-                  ))}
-                </select>
-              </div>
-              <div className="input-field">
-                <label>Head of Family</label>
-                <select
-                  name="head"
-                  onChange={onChange}
-                  required
-                  value={formData.head}
-                >
-                  <option disabled value="">
-                    Select head of family
-                  </option>
-                  {contactList.map((contact, i) => (
-                    <option key={i} value={contact._id || i}>
-                      {contact.name}
+                    {contactList.map((contact, i) => (
+                      <option key={i} value={contact._id || i}>
+                        {contact.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="input-field">
+                  <label>Head of Family</label>
+                  <select
+                    name="head"
+                    onChange={onChange}
+                    required
+                    value={formData.head}
+                  >
+                    <option disabled value="">
+                      Select head of family
                     </option>
-                  ))}
-                </select>
-              </div>
-              <div className="input-field">
-                <label>Full Address (local)</label>
-                <input
-                  minLength={10}
-                  name="address"
-                  onChange={(e) => onChange(e)}
-                  placeholder="Enter your full local address"
-                  required
-                  type="textarea"
-                  value={formData.address}
-                />
-              </div>
-              <div className="input-field">
-                <label>Native Town/City</label>
-                <input
-                  minLength={3}
-                  name="nativeAddress"
-                  onChange={(e) => onChange(e)}
-                  placeholder="Enter your native village/town/city"
-                  required
-                  type="text"
-                  value={formData.nativeAddress}
-                />
-              </div>
-              <div className="input-field">
-                <label>Gotra</label>
-                <input
-                  name="gotra"
-                  onChange={onChange}
-                  pattern="[A-Za-z]+"
-                  placeholder="Enter your gotra"
-                  required
-                  type="text"
-                  value={formData.gotra}
-                />
-              </div>
-              <div className="input-field">
-                <label>Email (to reach you out)</label>
-                <input
-                  name="email"
-                  onChange={onChange}
-                  placeholder="Enter your email"
-                  required
-                  type="email"
-                  value={formData.email}
-                />
-              </div>
-              <div className="input-field">
-                <label htmlFor="familyPhoto">Upload Family Photo</label>
-                <input
-                  accept="image/*"
-                  // hidden
-                  id="familyPhoto"
-                  name="picture"
-                  onChange={onChange}
-                  placeholder="upload"
-                  required
-                  type="file"
-                  // value={formData.familyPhoto}
-                />
-                {/* <button
+                    {contactList.map((contact, i) => (
+                      <option key={i} value={contact._id || i}>
+                        {contact.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="input-field">
+                  <label>Full Address (local)</label>
+                  <input
+                    minLength={10}
+                    name="address"
+                    onChange={(e) => onChange(e)}
+                    placeholder="Enter your full local address"
+                    required
+                    type="textarea"
+                    value={formData.address}
+                  />
+                </div>
+                <div className="input-field">
+                  <label>Native Town/City</label>
+                  <input
+                    minLength={3}
+                    name="nativeAddress"
+                    onChange={(e) => onChange(e)}
+                    placeholder="Enter your native village/town/city"
+                    required
+                    type="text"
+                    value={formData.nativeAddress}
+                  />
+                </div>
+                <div className="input-field">
+                  <label>Gotra</label>
+                  <input
+                    name="gotra"
+                    onChange={onChange}
+                    pattern="[A-Za-z]+"
+                    placeholder="Enter your gotra"
+                    required
+                    type="text"
+                    value={formData.gotra}
+                  />
+                </div>
+                <div className="input-field">
+                  <label>Email (to reach you out)</label>
+                  <input
+                    name="email"
+                    onChange={onChange}
+                    placeholder="Enter your email"
+                    required
+                    type="email"
+                    value={formData.email}
+                  />
+                </div>
+                <div className="input-field">
+                  <label htmlFor="familyPhoto">Upload Family Photo</label>
+                  <input
+                    accept="image/*"
+                    // hidden
+                    id="familyPhoto"
+                    name="picture"
+                    onChange={onChange}
+                    placeholder="upload"
+                    required
+                    type="file"
+                    // value={formData.familyPhoto}
+                  />
+                  {/* <button
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 roundedfont-bold my-10"
                     // htmlFor="familyPhoto"
                     type="button"
                   >
                     Upload Family Photo
                   </button> */}
-                {formData.picture && (
-                  <img
-                    alt="familyPhoto"
-                    src={
-                      typeof formData.picture === 'string'
-                        ? 'http://localhost:8000/img/fileupload/' +
-                          formData.picture
-                        : URL.createObjectURL(formData.picture)
-                    }
-                    style={{
-                      height: 100,
-                      marginRight: '1em',
-                      objectFit: 'contain',
-                      width: 100,
-                    }}
-                  />
-                )}
+                  {formData.picture && (
+                    <img
+                      alt="familyPhoto"
+                      src={
+                        typeof formData.picture === 'string'
+                          ? formData.picture
+                          : URL.createObjectURL(formData.picture)
+                      }
+                      style={{
+                        height: 100,
+                        marginRight: '1em',
+                        objectFit: 'contain',
+                        width: 100,
+                      }}
+                    />
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-          <div className="buttons">
-            <button
-              className="backBtn"
-              disabled={isLoading}
-              onClick={() => setIsStep2Visible(false)}
-            >
-              <i className="uil uil-navigator" />
-              <span className="btnText">Back</span>
-            </button>
+            <div className="buttons">
+              <button
+                className="backBtn"
+                disabled={isLoading}
+                onClick={() => setIsStep2Visible(false)}
+              >
+                <i className="uil uil-navigator" />
+                <span className="btnText">Back</span>
+              </button>
 
-            <button className="submit" disabled={isLoading} type="submit">
-              <span className="btnText">
-                {isLoading ? 'Submitting...' : 'Submit'}
-              </span>
-              <i className="uil uil-navigator" />
-            </button>
+              <button className="submit" disabled={isLoading} type="submit">
+                <span className="btnText">
+                  {isLoading ? 'Submitting...' : 'Submit'}
+                </span>
+                <i className="uil uil-navigator" />
+              </button>
+            </div>
           </div>
-        </div>
-      </form>
+        </form>
+      </fieldset>
     </div>
   );
 };

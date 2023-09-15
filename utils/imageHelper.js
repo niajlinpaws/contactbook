@@ -26,10 +26,10 @@ export default function onFileChange(e, setData) {
       type: 'image/jpeg',
     });
 
-    console.log(
-      '🚀 ~ file: imageHelper.js:29 ~ optimise ~ compressedFile:',
-      compressedFile,
-    );
+    // console.log(
+    //   '🚀 ~ file: imageHelper.js:29 ~ optimise ~ compressedFile:',
+    //   compressedFile,
+    // );
 
     // Save back the compressed file instead of the original file
     dataTransfer.items.add(compressedFile);
@@ -87,10 +87,10 @@ function readURL(selector, input, setData) {
       reader.onload = function (e) {
         imageURL = e.target.result;
         // $(`${selector} .img`).attr('src', e.target.result);
-        console.log(
-          '🚀 ~ file: imageHelper.js:64 ~ returnnewPromise ~ e.target.result:',
-          e.target.result,
-        );
+        // console.log(
+        //   '🚀 ~ file: imageHelper.js:64 ~ returnnewPromise ~ e.target.result:',
+        //   e.target.result,
+        // );
         resolve(e.target.result);
       };
 

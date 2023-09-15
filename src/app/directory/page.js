@@ -175,7 +175,10 @@ export default function Directory() {
                 <FamilyIcon className="w-4 h-4 font-semibold stroke-gray-600 hover:cursor-pointer" />
                 <p>{data.totalMembers}</p>
               </div>
-              <p className="truncate font-bold" style={{ maxWidth: '6rem' }}>
+              <p
+                className="capitalize truncate font-bold"
+                style={{ maxWidth: '6rem' }}
+              >
                 {data.gotra}
               </p>
             </div>

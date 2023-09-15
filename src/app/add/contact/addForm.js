@@ -42,18 +42,35 @@ function AddForm({
     // TODO: failing if same user edited twice
     if (isEdit) {
       setIsLoading(true);
-      const { res } = await fetchAPI({
-        endpoint: 'admin/users/add/data',
-        method: 'POST',
-        payload: JSON.stringify({
-          ...formData,
-          primaryContact: contactModalData.primaryContactId,
-        }),
-      });
 
-      if (res.message !== 'User added successfully') {
-        setIsLoading(false);
-        return alert('Oops! something went wrong. Please try again.');
+      if (contactModalData._id) {
+        const { res } = await fetchAPI({
+          endpoint: 'admin/users/edit/data',
+          method: 'POST',
+          payload: JSON.stringify({
+            ...formData,
+            id: contactModalData._id,
+          }),
+        });
+
+        if (res.message !== 'User edit successfully') {
+          setIsLoading(false);
+          return alert('Oops! something went wrong. Please try again.');
+        }
+      } else {
+        const { res } = await fetchAPI({
+          endpoint: 'admin/users/add/data',
+          method: 'POST',
+          payload: JSON.stringify({
+            ...formData,
+            primaryContact: contactModalData.primaryContactId,
+          }),
+        });
+
+        if (res.message !== 'User added successfully') {
+          setIsLoading(false);
+          return alert('Oops! something went wrong. Please try again.');
+        }
       }
     }
 
@@ -108,92 +125,93 @@ function AddForm({
           x
         </div> */}
       </div>
-      <form onSubmit={onSubmit}>
-        <div className="form first">
-          <div className="details personal">
-            <span className="title">Personal Details</span>
-            <div className="fields">
-              <div className="input-field">
-                <label>Full Name</label>
-                <input
-                  minLength={5}
-                  name="name"
-                  onChange={(e) => onChange(e)}
-                  // pattern="[a-zA-Z]"
-                  placeholder="Enter your name"
-                  required
-                  type="text"
-                  value={formData.name}
-                />
-              </div>
-              <div className="input-field">
-                <label>Date of Birth</label>
-                <input
-                  max={displayDateInInput(new Date())}
-                  name="dateOfBirth"
-                  onChange={onChange}
-                  placeholder="Enter birth date"
-                  required
-                  type="date"
-                  value={formData.dateOfBirth}
-                />
-              </div>
-              <div className="input-field">
-                <label>Date of Marriage</label>
-                <input
-                  disabled={''}
-                  name="dateOfMarriage"
-                  onChange={onChange}
-                  placeholder="Enter marriage date"
-                  // required
-                  type="date"
-                  value={formData.dateOfMarriage}
-                />
-              </div>
-              <div className="input-field">
-                <label>Mobile Number</label>
-                <input
-                  name="contactNumber"
-                  onChange={onChange}
-                  minLength={10}
-                  maxLength={10}
-                  pattern="[0-9]+"
-                  placeholder="Enter mobile number"
-                  required={isUserAdult()}
-                  type="tel"
-                  value={formData.contactNumber}
-                />
-              </div>
-              <div className="input-field">
-                <label>Gender</label>
-                <select
-                  name="gender"
-                  onChange={onChange}
-                  required
-                  value={formData.gender}
-                >
-                  <option disabled value="">
-                    Select gender
-                  </option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="others">Others</option>
-                </select>
-              </div>
-              <div className="input-field">
-                <label>Occupation</label>
-                <input
-                  name="occupation"
-                  onChange={onChange}
-                  placeholder="Enter your occupation"
-                  // required
-                  type="text"
-                  value={formData.occupation}
-                />
+      <fieldset disabled={isLoading}>
+        <form onSubmit={onSubmit}>
+          <div className="form first">
+            <div className="details personal">
+              <span className="title">Personal Details</span>
+              <div className="fields">
+                <div className="input-field">
+                  <label>Full Name</label>
+                  <input
+                    minLength={5}
+                    name="name"
+                    onChange={(e) => onChange(e)}
+                    // pattern="[a-zA-Z]"
+                    placeholder="Enter your name"
+                    required
+                    type="text"
+                    value={formData.name}
+                  />
+                </div>
+                <div className="input-field">
+                  <label>Date of Birth</label>
+                  <input
+                    max={displayDateInInput(new Date())}
+                    name="dateOfBirth"
+                    onChange={onChange}
+                    placeholder="Enter birth date"
+                    required
+                    type="date"
+                    value={formData.dateOfBirth}
+                  />
+                </div>
+                <div className="input-field">
+                  <label>Date of Marriage</label>
+                  <input
+                    disabled={''}
+                    name="dateOfMarriage"
+                    onChange={onChange}
+                    placeholder="Enter marriage date"
+                    // required
+                    type="date"
+                    value={formData.dateOfMarriage}
+                  />
+                </div>
+                <div className="input-field">
+                  <label>Mobile Number</label>
+                  <input
+                    name="contactNumber"
+                    onChange={onChange}
+                    minLength={10}
+                    maxLength={10}
+                    pattern="[0-9]+"
+                    placeholder="Enter mobile number"
+                    required={isUserAdult()}
+                    type="tel"
+                    value={formData.contactNumber}
+                  />
+                </div>
+                <div className="input-field">
+                  <label>Gender</label>
+                  <select
+                    name="gender"
+                    onChange={onChange}
+                    required
+                    value={formData.gender}
+                  >
+                    <option disabled value="">
+                      Select gender
+                    </option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="others">Others</option>
+                  </select>
+                </div>
+                <div className="input-field">
+                  <label>Occupation</label>
+                  <input
+                    name="occupation"
+                    onChange={onChange}
+                    placeholder="Enter your occupation"
+                    // required
+                    type="text"
+                    value={formData.occupation}
+                  />
+                </div>
               </div>
             </div>
-          </div>
-          {/* <div className="details ID">
+            {/* <div className="details ID">
             <span className="title">Identity Details</span>
             <div className="fields">
               <div className="input-field">
@@ -230,14 +248,14 @@ function AddForm({
               </div>
             </div>
           </div> */}
-          <button className="nextBtn" disabled={isLoading}>
-            <span className="btnText">
-              {isEdit && contactModalData.name ? 'Update' : 'Create'}
-            </span>
-            <i className="uil uil-navigator" />
-          </button>
-        </div>
-        {/* <div className="form second">
+            <button className="nextBtn" disabled={isLoading}>
+              <span className="btnText">
+                {isEdit && contactModalData.name ? 'Update' : 'Create'}
+              </span>
+              <i className="uil uil-navigator" />
+            </button>
+          </div>
+          {/* <div className="form second">
           <div className="details address">
             <span className="title">Address Details</span>
             <div className="fields">
@@ -320,7 +338,8 @@ function AddForm({
             </div>
           </div>
         </div> */}
-      </form>
+        </form>
+      </fieldset>
     </div>
   );
 }
