@@ -201,14 +201,10 @@ export default function AddContact() {
     // </section>
     <>
       {contactModalData && (
-        // <Modal>
-        //   <AddForm />
-        // </Modal>
         <div
-          className="fixed top-0 left-0 w-screen h-screen bg-zinc-700/50 flex flex-col justify-center items-center"
+          className="fixed top-0 left-0 w-screen h-screen bg-zinc-700/50"
           id="modal-bg"
-          style={{ padding: '0 15px' }}
-          //   onClick={hideContactDialog}
+          style={{ padding: '15px' }}
         >
           <AddForm
             contactModalData={contactModalData}

@@ -6,6 +6,13 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata = {
   title: 'Contact Book',
   description: 'Jain Community (Jaipur) Contact Book',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    shrinkToFit: 0,
+    userScalable: 0,
+  },
 };
 
 export default function RootLayout({ children }) {

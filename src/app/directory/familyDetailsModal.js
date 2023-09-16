@@ -66,67 +66,79 @@ export function FamilyDetailsModal({ children, data, hideContactDialog }) {
 
   return (
     <div
-      className="container overflow-auto"
-      style={{ marginTop: '8vh', zIndex: 1 }}
+      className="container"
+      style={{
+        //  marginTop: '8vh',
+        zIndex: 1,
+      }}
     >
-      <div className="flex justify-between">
+      <div className="flex justify-between edgeShadow">
         <header>Family Details</header>
         <div onClick={() => hideContactDialog()}>
           <CloseButton className="w-5 h-5 font-semibold stroke-gray-600 hover:cursor-pointer" />
         </div>
       </div>
-      <div className="form first my-6">
-        <div className="details personal">
-          <span className="title text-black font-semibold">Address:</span>
-          <span className="text-gray-400 ml-3">{actualFamilyData.address}</span>
+      <div className="dHeight" style={{ overflow: 'auto' }}>
+        <div className="form first my-6">
+          <div className="details personal">
+            <span className="title text-black font-semibold">Address:</span>
+            <span className="text-gray-400 ml-3">
+              {actualFamilyData.address}
+            </span>
+          </div>
+          <div className="details personal mt-6">
+            <span className="title text-black font-semibold">
+              Native Place:
+            </span>
+            <span className="text-gray-400 ml-3">
+              {actualFamilyData.nativeAddress}
+            </span>
+          </div>
+          <div className="details personal mt-6">
+            <span className="title text-black font-semibold">Gotra:</span>
+            <span className="text-gray-400 ml-3 capitalize">
+              {actualFamilyData.gotra}
+            </span>
+          </div>
+          <div className="details personal mt-6">
+            <span className="title text-black font-semibold">
+              Family Photo:
+            </span>
+            <img
+              className="aspect-video object-contain"
+              style={{ border: '1px solid black' }}
+              src={actualFamilyData.picture}
+            />
+          </div>
         </div>
-        <div className="details personal mt-6">
-          <span className="title text-black font-semibold">Native Place:</span>
-          <span className="text-gray-400 ml-3">
-            {actualFamilyData.nativeAddress}
-          </span>
-        </div>
-        <div className="details personal mt-6">
-          <span className="title text-black font-semibold">Gotra:</span>
-          <span className="text-gray-400 ml-3 capitalize">
-            {actualFamilyData.gotra}
-          </span>
-        </div>
-        <div className="details personal mt-6">
-          <span className="title text-black font-semibold">Family Photo:</span>
-          <img
-            className="aspect-video object-contain"
-            src={actualFamilyData.picture}
-          />
-        </div>
-      </div>
-      <div className="overflow-auto rounded-lg shadow">
-        <table className="w-full">
-          <thead className="bg-gray-50 border-b-2 border-gray-200 text-black">
-            <tr>
-              <th className="w-20 p-3 text-sm font-semibold tracking-wide text-left">
-                Name
-              </th>
-              <th className="w-20  p-3 text-sm font-semibold tracking-wide text-left">
-                Contact No.
-              </th>
-              <th className="w-24 p-3 text-sm font-semibold tracking-wide text-left">
-                Occupation
-              </th>
-              {/* <th className="w-24 p-3 text-sm font-semibold tracking-wide text-left">
+        <div className="overflow-auto rounded-lg shadow">
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b-2 border-gray-200 text-black">
+              <tr>
+                <th className="w-20 p-3 text-sm font-semibold tracking-wide text-left">
+                  Name
+                </th>
+                <th className="w-20  p-3 text-sm font-semibold tracking-wide text-left">
+                  Contact No.
+                </th>
+                <th className="w-24 p-3 text-sm font-semibold tracking-wide text-left">
+                  Occupation
+                </th>
+                {/* <th className="w-24 p-3 text-sm font-semibold tracking-wide text-left">
                     Gotra
                   </th>
                   <th className="w-32 p-3 text-sm font-semibold tracking-wide text-left">
                     Family Members
                   </th> */}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {data.users.map((contact) => (
-              <DesktopCard contactData={contact} key={contact._id} />
-            ))}
-          </tbody>
-        </table>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {data.users.map((contact) => (
+                <DesktopCard contactData={contact} key={contact._id} />
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

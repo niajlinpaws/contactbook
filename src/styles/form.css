@@ -167,6 +167,7 @@ body {
   position: relative;
   margin-top: 16px;
   min-height: 82vh;
+  min-height: 82dvh;
   background-color: #fff;
   overflow: hidden;
 }
@@ -227,6 +228,7 @@ select {
   padding: 0 15px;
   height: 42px;
   margin: 8px 0;
+  width: 84vw;
 }
 .input-field input :focus,
 .input-field select:focus {
@@ -282,6 +284,22 @@ form .buttons button:disabled,
 .backBtn:disabled,
 .nextBtn:disabled {
   opacity: 0.5;
+}
+.dHeight {
+  height: 82vh;
+  height: 82dvh;
+}
+.edgeShadow {
+  box-shadow: 0 8px 6px -6px black;
+  box-shadow: -3px 5px 6px -6px black;
+  /* position: absolute;
+  left: 0;
+  bottom: -4px;
+  height: 1px;
+  width: 100%; */
+}
+input::-webkit-date-and-time-value {
+  text-align: left;
 }
 
 @media (max-width: 750px) {
