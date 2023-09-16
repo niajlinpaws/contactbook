@@ -135,7 +135,7 @@ export default function Directory() {
                 width: '11rem',
               }}
             >
-              <PrimaryContact className="w-4 h-4 font-semibold stroke-gray-600 hover:cursor-pointer" />
+              <PrimaryContact className="w-5 h-4 font-semibold stroke-gray-600 hover:cursor-pointer" />
               <p className="truncate">{data.primaryContact.name}</p>
             </div>
           </div>
@@ -198,7 +198,10 @@ export default function Directory() {
           style={{ marginTop: '2.5vh' }}
         >
           <LocationPin className="w-8 h-7 font-semibold stroke-gray-600 hover:cursor-pointer" />
-          <p className="line-clamp-2" style={{ background: '#e5e7eb96' }}>
+          <p
+            className="capitalize line-clamp-2"
+            style={{ background: '#e5e7eb96' }}
+          >
             {data.address}
           </p>
         </div>
@@ -273,9 +276,9 @@ export default function Directory() {
       )}
       {filterModalData.visible && (
         <div
-          className="absolute top-0 left-0 w-screen h-screen bg-zinc-700/50 flex flex-col justify-center items-center"
+          className="fixed top-0 left-0 w-screen h-screen bg-zinc-700/50 flex flex-col justify-center items-center"
           id="modal-bg"
-          style={{ padding: '0 15px' }}
+          style={{ padding: '0 15px', zIndex: 1 }}
         >
           <FilterModal
             data={filterModalData}

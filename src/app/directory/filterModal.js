@@ -1,13 +1,8 @@
 import '../../styles/form.css';
 
 import CloseButton from '../../../public/closeButton';
-import { useEffect } from 'react';
 
 function FilterModal({ data: { data: filterData }, setFilterModalData }) {
-  // useEffect(() => {
-
-  // }, [])
-
   const applyFilters = (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -40,7 +35,7 @@ function FilterModal({ data: { data: filterData }, setFilterModalData }) {
           <div className="details personal">
             <span className="title">Search By</span>
             {/* <div className="fields"> */}
-            <div className="input-field">
+            <div className="input-field filterInput">
               {/* <label>Gender</label> */}
               <div className="flex flex-wrap">
                 <div className="mx-2 flex items-center w-1/2">

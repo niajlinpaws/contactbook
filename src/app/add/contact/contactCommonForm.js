@@ -174,7 +174,11 @@ const ContactCommonForm = ({
                       Select primary contact
                     </option>
                     {contactList.map((contact, i) => (
-                      <option key={i} value={contact._id || i}>
+                      <option
+                        className="capitalize"
+                        key={i}
+                        value={contact._id || i}
+                      >
                         {contact.name}
                       </option>
                     ))}
@@ -192,7 +196,11 @@ const ContactCommonForm = ({
                       Select head of family
                     </option>
                     {contactList.map((contact, i) => (
-                      <option key={i} value={contact._id || i}>
+                      <option
+                        className="capitalize"
+                        key={i}
+                        value={contact._id || i}
+                      >
                         {contact.name}
                       </option>
                     ))}
@@ -266,20 +274,30 @@ const ContactCommonForm = ({
                     Upload Family Photo
                   </button> */}
                   {formData.picture && (
-                    <img
-                      alt="familyPhoto"
-                      src={
+                    <a
+                      href={
                         typeof formData.picture === 'string'
                           ? formData.picture
                           : URL.createObjectURL(formData.picture)
                       }
-                      style={{
-                        height: 100,
-                        marginRight: '1em',
-                        objectFit: 'contain',
-                        width: 100,
-                      }}
-                    />
+                      target="_blank"
+                    >
+                      <img
+                        alt="familyPhoto"
+                        src={
+                          typeof formData.picture === 'string'
+                            ? formData.picture
+                            : URL.createObjectURL(formData.picture)
+                        }
+                        style={{
+                          border: '1px solid black',
+                          height: 100,
+                          marginRight: '1em',
+                          objectFit: 'contain',
+                          width: 100,
+                        }}
+                      />
+                    </a>
                   )}
                 </div>
               </div>

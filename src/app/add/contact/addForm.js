@@ -146,27 +146,63 @@ function AddForm({
                 </div>
                 <div className="input-field">
                   <label>Date of Birth</label>
-                  <input
-                    max={displayDateInInput(new Date())}
-                    name="dateOfBirth"
-                    onChange={onChange}
-                    placeholder="Enter birth date"
-                    required
-                    type="date"
-                    value={formData.dateOfBirth}
-                  />
+                  <div className="flex">
+                    <input
+                      max={displayDateInInput(new Date())}
+                      name="dateOfBirth"
+                      onChange={onChange}
+                      placeholder="Enter birth date"
+                      required
+                      type="date"
+                      value={formData.dateOfBirth}
+                    />
+                    {formData.dateOfBirth && (
+                      <span
+                        className="text-black"
+                        onClick={() =>
+                          onChange({
+                            target: { name: 'dateOfBirth', value: '' },
+                          })
+                        }
+                        style={{
+                          height: 'fit-content',
+                          margin: 'auto 0 auto 1em',
+                        }}
+                      >
+                        Clear
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="input-field">
                   <label>Date of Marriage</label>
-                  <input
-                    disabled={''}
-                    name="dateOfMarriage"
-                    onChange={onChange}
-                    placeholder="Enter marriage date"
-                    // required
-                    type="date"
-                    value={formData.dateOfMarriage}
-                  />
+                  <div className="flex">
+                    <input
+                      disabled={''}
+                      name="dateOfMarriage"
+                      onChange={onChange}
+                      placeholder="Enter marriage date"
+                      // required
+                      type="date"
+                      value={formData.dateOfMarriage}
+                    />
+                    {formData.dateOfMarriage && (
+                      <span
+                        className="text-black"
+                        onClick={() =>
+                          onChange({
+                            target: { name: 'dateOfMarriage', value: '' },
+                          })
+                        }
+                        style={{
+                          height: 'fit-content',
+                          margin: 'auto 0 auto 1em',
+                        }}
+                      >
+                        Clear
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="input-field">
                   <label>Mobile Number</label>

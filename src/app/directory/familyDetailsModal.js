@@ -11,6 +11,7 @@ export function FamilyDetailsModal({ children, data, hideContactDialog }) {
     : data.users[0].previousData.isCommonDetailsApprovedAfterRegistration
     ? data.users[0].previousData
     : {};
+  // TODO:
   // const actualFamilyUsersData = data.users.filter(x => {
 
   // })
@@ -19,6 +20,10 @@ export function FamilyDetailsModal({ children, data, hideContactDialog }) {
     const actualData = contactData.isApproved
       ? contactData
       : contactData.previousData;
+    // console.log(
+    //   '🚀 ~ file: familyDetailsModal.js:21 ~ DesktopCard ~ actualData:',
+    //   actualData,
+    // );
 
     return (
       <tr className="bg-white">
@@ -38,7 +43,7 @@ export function FamilyDetailsModal({ children, data, hideContactDialog }) {
         <td className="p-3 text-sm text-gray-700 capitalize">
           {actualData.contactNumber || '-'}
         </td>
-        <td className="p-3 text-sm text-gray-700">
+        <td className="capitalize p-3 text-sm text-gray-700">
           {actualData.occupation || '-'}
         </td>
         {/* <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
@@ -82,7 +87,7 @@ export function FamilyDetailsModal({ children, data, hideContactDialog }) {
         <div className="form first my-6">
           <div className="details personal">
             <span className="title text-black font-semibold">Address:</span>
-            <span className="text-gray-400 ml-3">
+            <span className="capitalize text-gray-400 ml-3">
               {actualFamilyData.address}
             </span>
           </div>
@@ -90,7 +95,7 @@ export function FamilyDetailsModal({ children, data, hideContactDialog }) {
             <span className="title text-black font-semibold">
               Native Place:
             </span>
-            <span className="text-gray-400 ml-3">
+            <span className="capitalize text-gray-400 ml-3">
               {actualFamilyData.nativeAddress}
             </span>
           </div>
@@ -104,11 +109,13 @@ export function FamilyDetailsModal({ children, data, hideContactDialog }) {
             <span className="title text-black font-semibold">
               Family Photo:
             </span>
-            <img
-              className="aspect-video object-contain"
-              style={{ border: '1px solid black' }}
-              src={actualFamilyData.picture}
-            />
+            <a href={actualFamilyData.picture} target="_blank">
+              <img
+                className="aspect-video object-contain"
+                style={{ border: '1px solid black' }}
+                src={actualFamilyData.picture}
+              />
+            </a>
           </div>
         </div>
         <div className="overflow-auto rounded-lg shadow">
@@ -145,5 +152,5 @@ export function FamilyDetailsModal({ children, data, hideContactDialog }) {
 }
 
 export function genderTextStyle(gender) {
-  return gender === 'Male' ? 'text-blue-500' : 'text-pink-500';
+  return gender?.toLowerCase() === 'male' ? 'text-blue-500' : 'text-pink-500';
 }

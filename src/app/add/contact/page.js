@@ -7,7 +7,9 @@ import Bin from '../../../../public/bin';
 
 import AddForm from './addForm';
 import ContactCommonForm from './contactCommonForm';
+
 import ContactIcon from '../../../../public/contact';
+import Add from '../../../../public/add';
 
 const displayDate = (date) =>
   Intl.DateTimeFormat('en-IN').format(new Date(date || null));
@@ -35,13 +37,13 @@ export default function AddContact() {
   const deleteData = (i) => {
     confirm(`Are you sure you want to remove ${contactList[i].name}?`)
       ? setContactList((prev) => {
-          // const list =
-          prev.splice(i, 1);
+          const list = prev.slice();
+          list.splice(i, 1);
 
-          console.log('🚀 ~ file: page.js:32 ~ ?setContactList ~ i:', i, prev);
-          localStorage.setItem('listData', JSON.stringify(prev));
+          // console.log('🚀 ~ file: page.js:32 ~ ?setContactList ~ i:', i, list);
+          localStorage.setItem('listData', JSON.stringify(list));
 
-          return prev;
+          return list;
         })
       : '';
     // setTimeout(() => {
@@ -231,7 +233,10 @@ export default function AddContact() {
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 roundedfont-bold my-10"
               onClick={openContactDialog}
             >
-              Add Contact
+              {/* <Add
+              // className="w-10 h-10 font-semibold stroke-gray-600 hover:cursor-pointer"
+              /> */}
+              {contactList.length ? 'Add More Members' : 'Add Contact'}
             </button>
             <div className="overflow-auto rounded-lg shadow hidden md:block">
               <table className="w-full">
@@ -306,7 +311,7 @@ export default function AddContact() {
                 ))
               ) : (
                 <p className="text-black mt-10 text-center">
-                  Start adding contacts to show here!
+                  Start adding contacts to show here! 👆🏻
                 </p>
               )}
             </div>

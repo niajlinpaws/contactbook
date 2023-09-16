@@ -185,7 +185,7 @@ export default function EditContact({ params }) {
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 roundedfont-bold my-10"
               onClick={openContactDialog}
             >
-              Add Contact
+              Add More Members
             </button>
             <div className="overflow-auto rounded-lg shadow hidden md:block">
               <table className="w-full">
