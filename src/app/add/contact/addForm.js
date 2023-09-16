@@ -195,7 +195,7 @@ function AddForm({
                     </option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
-                    <option value="others">Others</option>
+                    <option value="Others">Others</option>
                   </select>
                 </div>
                 <div className="input-field">
